@@ -1,0 +1,53 @@
+* {
+  outline: none;
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+
+  display: grid;
+  justify-items: center;
+  align-items: center;
+
+  overscroll-behavior: none;
+}
+
+#canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.buttons {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+
+  display: grid;
+  gap: 10px;
+
+  button {
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: none;
+    font-size: 3rem;
+    cursor: pointer;
+
+    transition: scale 0.2s ease;
+  }
+
+  button:hover {
+    scale: 1.05;
+  }
+
+  button:active {
+    scale: 0.95;
+  }
+}
