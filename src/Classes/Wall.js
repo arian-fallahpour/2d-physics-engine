@@ -1,13 +1,17 @@
 import canvas from "./Canvas";
+import Entity from "./Entity";
 import Vector from "./Vector";
 
-class Wall {
+class Wall extends Entity {
   constructor({
     start = new Vector(0, 0),
     end = new Vector(0, 0),
     elasticity = 1,
     color = "white",
+    ...otherArgs
   }) {
+    super(otherArgs);
+
     this.start = start;
     this.end = end;
     this.elasticity = elasticity;

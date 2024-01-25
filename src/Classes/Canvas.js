@@ -1,6 +1,5 @@
 import engine from "../data/engine";
 import options from "../data/options";
-import * as model from "../model";
 
 class Canvas {
   constructor({ backgroundColor = "black", mode = "normal" }) {

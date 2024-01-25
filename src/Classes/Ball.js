@@ -2,67 +2,42 @@ import canvas from "./Canvas";
 import Vector from "./Vector";
 
 import options from "../data/options";
+import engine from "../data/engine";
+import Entity from "./Entity";
 
 const fps = 60;
 
-class Ball {
-  _acceleration = new Vector(0, 0);
+class Ball extends Entity {
   _moving = {
+    acc: new Vector(0, 0),
     up: false,
     down: false,
     right: false,
     left: false,
   };
-  _frame = 0;
   _tail = [];
   _imageInstance;
 
   constructor({
-    name = "Ball",
-    pos = new Vector(0, 0),
     radius = 25,
-    color = "red",
-    borderColor = "transparent",
-    textColor = "white",
-    image,
-    rainbow = false,
     tailLength = 0,
+    image,
     controls = false,
-    displayVectors = false,
-    displayInfo = [],
-    mass = 1,
-    elasticity = 1,
-    friction = 0.0,
+    ...otherArgs
   }) {
+    super(otherArgs);
+
     // Vectors
-    this.pos = pos;
-    this.vel = new Vector(0, 0);
-    this.acc = new Vector(0, 0);
-    this.appliedAcc = new Vector(0, 0);
 
     // Scalars
     this.radius = radius;
-    this.color = color;
-    this.borderColor = borderColor;
-    this.textColor = textColor;
-    this.rainbow = rainbow;
     this.tailLength = tailLength;
-    this.friction = friction;
-    this.mass = mass;
-    this.inverseMass = mass > 0 ? 1 / mass : 0;
-    this.elasticity = elasticity;
 
     // Other Info
-    this.name = name;
     this.image = image;
 
     // Settings
     this.controls = controls;
-    this.displayVectors = displayVectors;
-    this.displayInfo = displayInfo;
-
-    // Initial state
-    this.initial = { ...this };
 
     if (this.controls) {
       this.controlMovement();
@@ -72,21 +47,9 @@ class Ball {
       this.loadImage();
       this.color = "transparent";
     }
-  }
 
-  // APPLIED MOVEMENT
-  applyAcc(acc) {
-    this.appliedAcc = acc;
-  }
-
-  setVel(vel) {
-    this.vel = vel;
-  }
-
-  shiftColor() {
-    this.color = `hsl(${
-      (this._frame / options.requestFrameCount) % 360
-    }, 100%, 50%)`;
+    // InitialState
+    this.setInitial();
   }
 
   showTail() {
@@ -113,8 +76,6 @@ class Ball {
 
   // DRAW FUNCTIONS
   draw() {
-    this._frame += 1;
-
     // Apply rainbow effect
     if (this.rainbow) {
       this.shiftColor();
@@ -255,7 +216,7 @@ class Ball {
 
   // POSITION FUNCTIONS
   reposition() {
-    this.acc = this.appliedAcc.add(this._acceleration);
+    this.acc = this.appliedAcc.add(this._moving.acc);
     this.vel = this.vel
       .add(this.acc.divide(options.requestFrameCount))
       .multiply(1 - this.friction);
@@ -304,7 +265,7 @@ class Ball {
           direction.x = 0;
         }
 
-        this._acceleration = direction.unit().multiply(magnitude);
+        this._moving.acc = direction.unit().multiply(magnitude);
       });
     });
   }
@@ -320,7 +281,6 @@ class Ball {
 
     // Depth of penetration
     let penetrationDepth = this.radius + ball.radius - distance.magnitude();
-    // console.log(distance.unit().dot(this.vel));
     // penetrationDepth -= (fps / 1000) * distance.unit().dot(this.vel); // results in balls sticking to each other
     // penetrationDepth -= distance.unit().dot(this.vel);
 
@@ -393,7 +353,7 @@ class Ball {
     const penetrationVector = this.closestPointToWall(wall).subtract(this.pos);
 
     let penetrationDepth = this.radius - penetrationVector.magnitude();
-    penetrationDepth += (fps / 1000) * penetrationVector.unit().dot(this.vel);
+    penetrationDepth += (fps / 1000) * this.vel.magnitude();
     // penetrationDepth +=
     // (penetrationDepth / this.radius) * penetrationVector.unit().dot(this.vel);
 
@@ -409,6 +369,8 @@ class Ball {
 
     const separatingVelocity = this.vel.dot(normal);
     const newSeparatingVelocity = -separatingVelocity * wall.elasticity;
+    // const newSeparatingVelocity =
+    //   -separatingVelocity * wall.elasticity * 1.005295;
 
     const separatingVelocityDifference =
       newSeparatingVelocity - separatingVelocity;
@@ -448,7 +410,6 @@ class Ball {
 
     let penetrationDepth = this.radius - penetrationVector.magnitude();
     penetrationDepth += (fps / 1000) * this.vel.magnitude();
-    // penetrationDepth += (fps / 1000) * penetrationVector.unit().dot(this.vel);
 
     // Conserves energy if penetrationDepth occurs at an "awkward" frame
     // if (penetrationDepth < 0.001) {
@@ -473,22 +434,6 @@ class Ball {
 
     this.vel = this.vel.add(normal.multiply(separatingVelocityDifference));
   }
-
-  static revert(ball) {
-    Object.keys(ball.initial).forEach((key) => {
-      ball[key] = ball.initial[key];
-    });
-  }
-
-  // static reverter(ball, values = []) {
-  //   let reverting = false;
-
-  // values.forEach((value) => {
-
-  // })
-
-  //   return { reverting };
-  // }
 }
 
 // const closestPoint = wall.start.subtract(closestDistanceVector);

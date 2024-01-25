@@ -1,4 +1,4 @@
-import ESSerializer from "esserializer";
+import * as engine from "./data/engine";
 
 import Ball from "./Classes/Ball";
 import Circle from "./Classes/Circle";
@@ -17,7 +17,7 @@ export function serialize(classInstance) {
 }
 
 export function deserialize(str) {
-  const classes = { Object, Ball, Wall, Circle, Vector, Sound };
+  const classes = { Object, ...engine.classes };
 
   return JSON.parse(str, (key, value) => {
     if (value && typeof value === "object" && value.__type) {
@@ -35,3 +35,15 @@ export function deserialize(str) {
     return value;
   });
 }
+
+export const blend = (current, final, step) => {
+  if (current < final) {
+    return Math.min(current + step, final);
+  }
+
+  if (current > final) {
+    return Math.max(current - step, final);
+  }
+
+  return final;
+};

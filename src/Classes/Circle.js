@@ -1,17 +1,13 @@
 import canvas from "./Canvas";
-import Vector from "./Vector";
+import Entity from "./Entity";
 
-class Circle {
-  constructor({
-    pos = new Vector(0, 0),
-    radius = 100,
-    color = "black",
-    elasticity = 1,
-  }) {
-    this.pos = pos;
+class Circle extends Entity {
+  constructor({ radius = 100, ...otherArgs }) {
+    super(otherArgs);
+
     this.radius = radius;
-    this.color = color;
-    this.elasticity = elasticity;
+
+    this.setInitial();
   }
 
   draw() {
@@ -25,6 +21,8 @@ class Circle {
     );
     canvas.ctx.strokeStyle = this.color;
     canvas.ctx.stroke();
+
+    this.reposition();
   }
 }
 
