@@ -76,18 +76,18 @@ class Ball extends Entity {
 
   // DRAW FUNCTIONS
   draw() {
-    // Apply rainbow effect
-    if (this.rainbow) {
-      this.shiftColor();
-    }
-
     // Leave trail behind
     if (this.tailLength !== 0) {
       this.showTail();
     }
 
     // Draw circle
-    this.drawCircle(this);
+    this.drawCircle({
+      pos: this.pos,
+      radius: this.radius,
+      color: this._colors.fill,
+      borderColor: this._colors.border,
+    });
 
     // Draw image if exists
     if (this.image) {
@@ -281,8 +281,6 @@ class Ball extends Entity {
 
     // Depth of penetration
     let penetrationDepth = this.radius + ball.radius - distance.magnitude();
-    // penetrationDepth -= (fps / 1000) * distance.unit().dot(this.vel); // results in balls sticking to each other
-    // penetrationDepth -= distance.unit().dot(this.vel);
 
     // Fixes balls getting stuck if on exact same axis
     if (this.pos.x === ball.pos.x || this.pos.y === ball.pos.y) {
@@ -354,8 +352,6 @@ class Ball extends Entity {
 
     let penetrationDepth = this.radius - penetrationVector.magnitude();
     penetrationDepth += (fps / 1000) * this.vel.magnitude();
-    // penetrationDepth +=
-    // (penetrationDepth / this.radius) * penetrationVector.unit().dot(this.vel);
 
     const penetrationResolution = penetrationVector
       .unit()
@@ -369,8 +365,6 @@ class Ball extends Entity {
 
     const separatingVelocity = this.vel.dot(normal);
     const newSeparatingVelocity = -separatingVelocity * wall.elasticity;
-    // const newSeparatingVelocity =
-    //   -separatingVelocity * wall.elasticity * 1.005295;
 
     const separatingVelocityDifference =
       newSeparatingVelocity - separatingVelocity;
@@ -418,9 +412,14 @@ class Ball extends Entity {
 
     const penetrationResolution = penetrationVector
       .unit()
-      .multiply(penetrationDepth);
+      .multiply(penetrationDepth / (this.inverseMass + circle.inverseMass));
 
-    this.pos = this.pos.subtract(penetrationResolution);
+    this.pos = this.pos.subtract(
+      penetrationResolution.multiply(this.inverseMass)
+    );
+    circle.pos = circle.pos.add(
+      penetrationResolution.multiply(circle.inverseMass)
+    );
   }
 
   resolveCircleCollision(circle) {
@@ -431,8 +430,15 @@ class Ball extends Entity {
 
     const separatingVelocityDifference =
       newSeparatingVelocity - separatingVelocity;
+    const impulse =
+      separatingVelocityDifference / (this.inverseMass + circle.inverseMass);
+    const impulseVector = normal.multiply(impulse);
 
-    this.vel = this.vel.add(normal.multiply(separatingVelocityDifference));
+    // this.vel = this.vel.add(normal.multiply(separatingVelocityDifference));
+
+    // Apply collision respond to balls
+    this.vel = this.vel.add(impulseVector.multiply(this.inverseMass));
+    circle.vel = circle.vel.add(impulseVector.multiply(-circle.inverseMass));
   }
 }
 

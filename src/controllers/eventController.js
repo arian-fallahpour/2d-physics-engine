@@ -16,20 +16,9 @@ const eventHandler = () => {
       requestNextFrame(false);
     }
 
-    // Save button
-    if (e.target.classList.contains("button-save")) {
-      // model.saveState();
-      requestAnimationFrame(frameHandler);
-    }
-
-    // Reload button
-    if (e.target.classList.contains("button-reload")) {
+    // Reset button
+    if (e.target.classList.contains("button-reset")) {
       model.resetState();
-    }
-
-    // Delete button
-    if (e.target.classList.contains("button-delete")) {
-      model.deletePreset();
     }
 
     // Next preset button

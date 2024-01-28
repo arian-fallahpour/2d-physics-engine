@@ -35,15 +35,3 @@ export function deserialize(str) {
     return value;
   });
 }
-
-export const blend = (current, final, step) => {
-  if (current < final) {
-    return Math.min(current + step, final);
-  }
-
-  if (current > final) {
-    return Math.max(current - step, final);
-  }
-
-  return final;
-};

@@ -12,44 +12,68 @@ const frameHandler = (timeMs) => {
   calculateFrameMetrics(timeMs);
 
   // Clear Canvas for next frame
-  canvas.clear();
+  canvas.prepare();
+
+  // Get current preset
+  // console.log(state.presets[state.preset].objects.balls);
+  const preset = state.presets[state.preset];
 
   // Render static objects
-  Entity.render(state.objects.circles);
-  Entity.render(state.objects.walls);
-  Entity.render(state.objects.fractals);
+  Entity.render(preset.objects.circles);
+  Entity.render(preset.objects.walls);
+  Entity.render(preset.objects.fractals);
 
-  // Render Dynamic objects
-  Entity.render(state.objects.balls, (ball1, i) => {
+  // Render dynamic objects
+  Entity.render(preset.objects.balls, (ball1, i) => {
     // Check if penetrating any other balls
-    state.objects.balls.forEach((ball2, j) => {
-      if (i === j) return;
-      if (!ball1.isPenetratingBall(ball2)) return;
+    // preset.objects.balls.forEach((ball2, j) => {
+    //   if (i === j) return;
+    //   if (!ball1.isPenetratingBall(ball2)) return;
 
-      ball1.modify("active");
-      ball2.modify("active");
+    //   const data = {
+    //     ball1,
+    //     ball2,
+    //     ball1Index: i,
+    //     ball2Index: j,
+    //   };
 
-      ball1.resolveBallPenetration(ball2);
-      ball1.resolveBallCollision(ball2);
-    });
+    //   ball1.modify("active");
+    //   ball2.modify("active");
+
+    //   ball1.resolveBallPenetration(ball2);
+    //   ball1.resolveBallCollision(ball2);
+    // });
 
     // Check if penetrating any circles
-    state.objects.circles.forEach((circle, j) => {
+    preset.objects.circles.forEach((circle, j) => {
       if (!ball1.isPenetratingCircle(circle)) return;
+      const data = {
+        circle,
+        ball: ball1,
+        ballIndex: i,
+        circleIndex: j,
+      };
 
-      ball1.modify("active");
-      circle.modify("active");
+      ball1.modify("active", data);
+      circle.modify("active", data);
 
       ball1.resolveCirclePenetration(circle);
       ball1.resolveCircleCollision(circle);
     });
 
     // Check if penetrating any walls
-    state.objects.walls.forEach((wall, j) => {
+    preset.objects.walls.forEach((wall, j) => {
       if (!ball1.isPenetratingWall(wall)) return;
 
-      ball1.modify("active");
-      wall.modify("active");
+      const data = {
+        wall,
+        ball: ball1,
+        ballIndex: i,
+        wallIndex: j,
+      };
+
+      ball1.modify("active", data);
+      wall.modify("active", data);
 
       ball1.resolveWallPenetration(wall);
       ball1.resolveWallCollision(wall);

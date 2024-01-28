@@ -1,20 +1,26 @@
-import engine from "../data/engine";
 import options from "../data/options";
 import Vector from "./Vector";
 
 class Entity {
+  _frame = 0;
+  _colors = {
+    fill: "",
+    border: "",
+    text: "",
+  };
+
   constructor({
     name = `${this.constructor.name}-${Math.random()}-${Date.now()}`,
     pos = new Vector(0, 0),
     vel = new Vector(0, 0),
     appliedAcc = new Vector(0, 0),
     color = "white",
-    borderColor = "transparent",
-    textColor = "white",
-    rainbow = false,
+    borderColor = "white",
+    textColor = "black",
     displayVectors = false,
     displayInfo = [],
     mass = 1,
+    rainbow = false,
     elasticity = 1,
     friction = 0,
     modifiers = [],
@@ -58,8 +64,12 @@ class Entity {
   // DRAWING
   shiftColor() {
     this.color = `hsl(${
-      (engine.frame / options.requestFrameCount) % 360
+      (this._frame / options.requestFrameCount) % 360
     }, 100%, 50%)`;
+  }
+
+  getRainbow() {
+    return `hsl(${(this._frame / options.requestFrameCount) % 360}, 100%, 50%)`;
   }
 
   reposition() {
@@ -79,22 +89,64 @@ class Entity {
   }
 
   /** Runs all modifiers of indicated type */
-  modify(type) {
-    this.modifiers.forEach((modifier) => modifier[type]());
+  modify(type, data) {
+    this.modifiers.forEach((modifier) => modifier[type](data));
   }
 
-  /** Reverts ball to initial state */
-  static revert(object) {
-    Entity.keys(object.initial).forEach((key) => {
-      object[key] = object.initial[key];
+  /** Resets entity to its initial state */
+  reset() {
+    if (!this.initial) throw new Error("You forgot to set initial state");
+
+    Object.keys(this.initial).forEach((key) => {
+      // Skip if values don't exist (exclude 0)
+      if (
+        this[key] === undefined ||
+        this[key] === null ||
+        this.initial[key] === undefined ||
+        this.initial[key] === null
+      ) {
+        return;
+      }
+
+      this[key] = this.initial[key];
     });
+  }
+
+  calculateColor() {
+    if (this.color === "rainbow") {
+      this._colors.fill = this.getRainbow();
+    } else {
+      this._colors.fill = this.color;
+    }
+
+    if (this.borderColor === "rainbow") {
+      this._colors.border = this.getRainbow();
+    } else {
+      this._colors.border = this.borderColor;
+    }
+
+    if (this.textColor === "rainbow") {
+      this._colors.text = this.getRainbow();
+    } else {
+      this._colors.text = this.textColor;
+    }
   }
 
   /** Modifies and draws objects with a callback function occuring after */
   static render(objects, cb = (object, i, arr) => {}) {
     objects.forEach((object, i, arr) => {
+      object._frame += 1;
+
+      // Calculate true color value
+      object.calculateColor();
+
+      // Apply modifiers
       object.modify("passive");
+
+      // Draw object
       object.draw();
+
+      // Callback function
       cb(object, i, arr);
     });
   }

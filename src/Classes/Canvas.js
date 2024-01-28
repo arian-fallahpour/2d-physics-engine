@@ -32,7 +32,7 @@ class Canvas {
     );
   }
 
-  clear() {
+  prepare() {
     const modes = {
       normal: "rgba(0,0,0,1)",
       lucid: `rgba(0,0,0,${
@@ -42,6 +42,10 @@ class Canvas {
     };
 
     this.fillCanvas(modes[this.mode]);
+  }
+
+  clear() {
+    this.fillCanvas(this.backgroundColor);
   }
 }
 

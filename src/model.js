@@ -1,3 +1,5 @@
+import canvas from "./Classes/Canvas";
+import frameHandler from "./controllers/frameController";
 import { deserialize, serialize } from "./helper";
 
 export const state = {
@@ -37,61 +39,35 @@ export const play = () => {
   document.querySelector(".button-play").textContent = "⏸️";
 };
 
-export const setState = (type, preset) => {
-  if (!["static", "dynamic"].includes(type)) return;
-  const serialized = serialize(preset);
-  state[type] = deserialize(serialized); // Prevents referencing of data
-};
-
-export const updateStates = () => {
-  const preset = state.presets[state.preset] || state.static;
-
-  setState("static", preset);
-  setState("dynamic", preset);
-};
-
-/** Saves static state as a preset to local storage*/
-export const saveState = () => {
-  const preset = state.static;
-  state.presets.push(preset);
-
-  localStorage.setItem("presets", serialize(state.presets));
-};
-
-/** Retrieves presets from local storage*/
-export const loadState = () => {
-  const str = localStorage.getItem("presets");
-  if (!str) return;
-
-  const presets = deserialize(str);
-
-  // Set presets state if exists
-  if (!presets.length) return;
-  state.presets = presets;
-
-  // Update states
-  updateStates();
-};
-
-export const deletePreset = () => {
-  if (!state.presets.length) return;
-
-  state.presets.splice(state.preset, 1);
-  localStorage.setItem("presets", serialize(state.presets));
-};
-
-export const resetState = () => {
-  updateStates();
-};
-
 /** Sets current state as the next preset */
 export const nextPreset = () => {
+  pause();
+
+  // Reset last state
+  state.presets[state.preset].reset();
+
+  // Pause engine and skip to next frame
+  canvas.clear();
+  requestAnimationFrame(frameHandler);
+
   state.preset = (state.preset + 1) % state.presets.length;
-  updateStates();
 };
 
 /** Sets current state as the previous preset */
 export const previousPreset = () => {
-  state.preset = (state.preset + 1) % state.presets.length;
-  updateStates();
+  pause();
+
+  // Reset last state
+  state.presets[state.preset].reset();
+
+  // Pause engine and skip to next frame
+  canvas.clear();
+  requestAnimationFrame(frameHandler);
+
+  state.preset =
+    (state.preset - 1 + state.presets.length) % state.presets.length;
+};
+
+export const resetState = () => {
+  state.presets[state.preset].reset();
 };
