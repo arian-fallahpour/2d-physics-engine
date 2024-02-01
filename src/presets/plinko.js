@@ -1,9 +1,10 @@
-import Ball from "../Classes/Ball";
-import canvas from "../Classes/Canvas";
-import Circle from "../Classes/Circle";
-import Preset from "../Classes/Preset";
-import Vector from "../Classes/Vector";
-import Wall from "../Classes/Wall";
+import canvas from "../classes/Canvas";
+import Preset from "../classes/Preset";
+
+import Ball from "../classes/objects/Ball";
+import Circle from "../classes/objects/Circle";
+import Vector from "../classes/Vector";
+import Wall from "../classes/objects/Wall";
 import {
   plinkoBallModifier,
   plinkoRemoveBallWallModifier,
@@ -17,9 +18,11 @@ plinko.init((preset) => {
   const layers = 6;
   const layerHeight = 57.4;
   const circlesInitial = 3;
+  const circleElasticity = 0;
   const gridHeight = 150;
   const radiusCircle = 7.5;
-  const radiusBall = 7.5;
+  const radiusBall = 6;
+  const startRange = 1;
 
   const circles = [];
   for (let i = 0; i < layers; i++) {
@@ -36,7 +39,7 @@ plinko.init((preset) => {
         radius: radiusCircle,
         color: "grey",
         borderColor: "transparent",
-        elasticity: 0.4,
+        elasticity: circleElasticity,
       });
       circles.push(circle);
     }
@@ -44,18 +47,18 @@ plinko.init((preset) => {
   preset.addObjects("circles", ...circles);
 
   // Render balls
-  const range = 1;
   const createNewBall = (initial = false) => {
     const ball = new Ball({
       pos: new Vector(
-        canvas.element.clientWidth / 2 + Math.random() * range - range / 2,
-        canvas.element.clientHeight / 2 + gridHeight + layerHeight
+        canvas.element.clientWidth / 2 +
+          Math.random() * startRange -
+          startRange / 2,
+        canvas.element.clientHeight / 2 + gridHeight + layerHeight * 2
       ),
       radius: radiusBall,
       color: initial ? "red" : "rainbow",
       borderColor: "transparent",
       appliedAcc: !initial ? new Vector(0, -0.2) : undefined,
-      elasticity: 0,
     });
     ball.addModifier(plinkoBallModifier(ball));
 
@@ -82,8 +85,8 @@ plinko.init((preset) => {
       end: new Vector(startX + layerHeight - radiusCircle * 2, startY),
       color: "grey",
     });
-    wall.addModifier(plinkoRemoveBallWallModifier(wall));
-    wall.addModifier(plinkoWallModifier(wall, createNewBall));
+    wall.addModifier(plinkoRemoveBallWallModifier());
+    wall.addModifier(plinkoWallModifier(createNewBall));
     walls.push(wall);
   }
   preset.addObjects("walls", ...walls);
@@ -117,8 +120,8 @@ plinko.init((preset) => {
       color: "white",
     });
 
-    bound.addModifier(plinkoWallModifier(bound, createNewBall));
-    bound.addModifier(plinkoRemoveBallWallModifier(bound));
+    bound.addModifier(plinkoWallModifier(createNewBall));
+    bound.addModifier(plinkoRemoveBallWallModifier());
     bounds.push(bound);
   }
   preset.addObjects("walls", ...bounds);

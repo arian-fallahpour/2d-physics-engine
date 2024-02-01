@@ -14,6 +14,7 @@ class Melody {
   /** Plays current note in sequence and optionally increments */
   playNote(increment = true) {
     const note = this.sequence[this.sequenceIndex];
+    // console.log(note);
     this.sound.play(note);
 
     // Increment current sequence index

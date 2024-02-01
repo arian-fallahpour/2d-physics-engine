@@ -1,11 +1,5 @@
 import * as engine from "./data/engine";
 
-import Ball from "./Classes/Ball";
-import Circle from "./Classes/Circle";
-import Vector from "./Classes/Vector";
-import Wall from "./Classes/Wall";
-import Sound from "./Classes/Sound";
-
 export function serialize(classInstance) {
   return JSON.stringify(classInstance, (key, value) => {
     if (value && typeof value === "object") {

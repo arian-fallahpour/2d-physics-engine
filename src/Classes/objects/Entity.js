@@ -1,5 +1,5 @@
-import options from "../data/options";
-import Vector from "./Vector";
+import options from "../../data/options";
+import Vector from "../Vector";
 
 class Entity {
   _frame = 0;
@@ -59,13 +59,6 @@ class Entity {
 
   setVel(vel) {
     this.vel = vel;
-  }
-
-  // DRAWING
-  shiftColor() {
-    this.color = `hsl(${
-      (this._frame / options.requestFrameCount) % 360
-    }, 100%, 50%)`;
   }
 
   getRainbow() {
@@ -134,6 +127,7 @@ class Entity {
 
   /** Modifies and draws objects with a callback function occuring after */
   static render(objects, cb = (object, i, arr) => {}) {
+    if (objects.length === 0) return;
     objects.forEach((object, i, arr) => {
       object._frame += 1;
 

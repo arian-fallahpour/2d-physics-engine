@@ -1,10 +1,25 @@
-import canvas from "../Classes/Canvas";
+import canvas from "../classes/Canvas";
 
 import * as model from "../model";
 
 import options from "../data/options";
 import engine from "../data/engine";
-import Entity from "../Classes/Entity";
+import Entity from "../classes/objects/Entity";
+
+import {
+  isBallBallPenetrating,
+  isBallWallPenetrating,
+  resolveBallBallCollision,
+  resolveBallWallPenetration,
+  resolveBallBallPenetration,
+  resolveBallWallCollision,
+  isBallCirclePenetrating,
+  resolveBallCirclePenetration,
+  resolveBallCircleCollision,
+  isCircleCirclePenetrating,
+  resolveCircleCirclePenetration,
+  resolveCircleCircleCollision,
+} from "./collisionController";
 
 const frameHandler = (timeMs) => {
   const { state } = model;
@@ -15,38 +30,63 @@ const frameHandler = (timeMs) => {
   canvas.prepare();
 
   // Get current preset
-  // console.log(state.presets[state.preset].objects.balls);
   const preset = state.presets[state.preset];
 
-  // Render static objects
-  Entity.render(preset.objects.circles);
+  // Render objects
   Entity.render(preset.objects.walls);
   Entity.render(preset.objects.fractals);
+  Entity.render(preset.objects.texts);
 
-  // Render dynamic objects
+  Entity.render(preset.objects.circles, (circle1, i) => {
+    preset.objects.circles.forEach((circle2, j) => {
+      if (i === j) return; // If same circle
+      if (i < j) return; // If resolution has already been calculated
+
+      const isPenetrating = isCircleCirclePenetrating(circle1, circle2);
+      if (!isPenetrating) return;
+
+      const data = {
+        circle1,
+        circle2,
+        circle1Index: i,
+        circle2Index: j,
+      };
+      circle1.modify("active", data);
+      circle2.modify("active", data);
+
+      resolveCircleCirclePenetration(circle1, circle2);
+      resolveCircleCircleCollision(circle1, circle2);
+    });
+  });
+
   Entity.render(preset.objects.balls, (ball1, i) => {
     // Check if penetrating any other balls
-    // preset.objects.balls.forEach((ball2, j) => {
-    //   if (i === j) return;
-    //   if (!ball1.isPenetratingBall(ball2)) return;
+    preset.objects.balls.forEach((ball2, j) => {
+      if (i === j) return; // If same ball
+      if (i < j) return; // If resolution has already been calculated
 
-    //   const data = {
-    //     ball1,
-    //     ball2,
-    //     ball1Index: i,
-    //     ball2Index: j,
-    //   };
+      const isPenetrating = isBallBallPenetrating(ball1, ball2);
+      if (!isPenetrating) return;
 
-    //   ball1.modify("active");
-    //   ball2.modify("active");
+      const data = {
+        ball1,
+        ball2,
+        ball1Index: i,
+        ball2Index: j,
+      };
 
-    //   ball1.resolveBallPenetration(ball2);
-    //   ball1.resolveBallCollision(ball2);
-    // });
+      ball1.modify("active", data);
+      ball2.modify("active", data);
+
+      resolveBallBallPenetration(ball1, ball2);
+      resolveBallBallCollision(ball1, ball2);
+    });
 
     // Check if penetrating any circles
     preset.objects.circles.forEach((circle, j) => {
-      if (!ball1.isPenetratingCircle(circle)) return;
+      const isPenetrating = isBallCirclePenetrating(ball1, circle);
+      if (!isPenetrating) return;
+
       const data = {
         circle,
         ball: ball1,
@@ -57,17 +97,18 @@ const frameHandler = (timeMs) => {
       ball1.modify("active", data);
       circle.modify("active", data);
 
-      ball1.resolveCirclePenetration(circle);
-      ball1.resolveCircleCollision(circle);
+      resolveBallCirclePenetration(ball1, circle);
+      resolveBallCircleCollision(ball1, circle);
     });
 
     // Check if penetrating any walls
     preset.objects.walls.forEach((wall, j) => {
-      if (!ball1.isPenetratingWall(wall)) return;
+      const isPenetrating = isBallWallPenetrating(ball1, wall);
+      if (!isPenetrating) return;
 
       const data = {
-        wall,
         ball: ball1,
+        wall,
         ballIndex: i,
         wallIndex: j,
       };
@@ -75,8 +116,8 @@ const frameHandler = (timeMs) => {
       ball1.modify("active", data);
       wall.modify("active", data);
 
-      ball1.resolveWallPenetration(wall);
-      ball1.resolveWallCollision(wall);
+      resolveBallWallPenetration(ball1, wall);
+      resolveBallWallCollision(ball1, wall);
     });
   });
 

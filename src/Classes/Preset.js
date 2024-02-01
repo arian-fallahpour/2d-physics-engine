@@ -1,5 +1,3 @@
-import Entity from "./Entity";
-
 class Preset {
   constructor(name = `preset-${Math.random()}-${Date.now()}`) {
     this.name = name;
@@ -10,6 +8,7 @@ class Preset {
       walls: [],
       fractals: [],
       vectors: [],
+      texts: [],
     };
   }
 

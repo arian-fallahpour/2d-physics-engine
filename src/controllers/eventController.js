@@ -1,6 +1,6 @@
 import * as model from "../model";
 
-import frameHandler, { requestNextFrame } from "./frameController";
+import { requestNextFrame } from "./frameController";
 
 const eventHandler = () => {
   // EVENT HANDLERS

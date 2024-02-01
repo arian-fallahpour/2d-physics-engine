@@ -1,4 +1,4 @@
-import canvas from "./Classes/Canvas";
+import canvas from "./classes/Canvas";
 import frameHandler from "./controllers/frameController";
 import { deserialize, serialize } from "./helper";
 

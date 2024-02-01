@@ -1,4 +1,4 @@
-import canvas from "./Canvas";
+import canvas from "../Canvas";
 import Entity from "./Entity";
 
 class Circle extends Entity {
@@ -28,6 +28,16 @@ class Circle extends Entity {
     canvas.ctx.fill();
 
     this.reposition();
+  }
+
+  closestPointTo(pos) {
+    const circleToBall = pos.subtract(this.pos);
+    const closestPoint = circleToBall
+      .unit()
+      .multiply(this.radius)
+      .add(this.pos);
+
+    return closestPoint;
   }
 }
 

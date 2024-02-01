@@ -1,10 +1,10 @@
-import Ball from "../Classes/Ball";
-import Entity from "../Classes/Entity";
-import Melody from "../Classes/Melody";
-import Sound from "../Classes/Sound";
-import Vector from "../Classes/Vector";
-import Wall from "../Classes/Wall";
-import Fractal from "../Classes/Fractal";
+import Ball from "../classes/objects/Ball";
+import Entity from "../classes/objects/Entity";
+import Melody from "../classes/Melody";
+import Sound from "../classes/Sound";
+import Vector from "../classes/Vector";
+import Wall from "../classes/objects/Wall";
+import Fractal from "../classes/Fractal";
 
 export default {
   frame: 0,

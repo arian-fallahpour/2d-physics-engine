@@ -1,6 +1,10 @@
 import * as model from "../model";
-import Vector from "../Classes/Vector";
+import Vector from "../classes/Vector";
 import notes from "../data/notes";
+import options from "../data/options";
+import Sound from "../classes/Sound";
+import Melody from "../classes/Melody";
+import canvas from "../classes/Canvas";
 
 const blend = (current, final, step) => {
   if (current < final) {
@@ -34,7 +38,7 @@ const determineAction = (
 
 export const revertBallModifier = (ball, reverter) => {
   const revert = () => {
-    canvas.mode = "normal";
+    canvas.mode = "lucid";
 
     ball.color = ball.initial.color;
     ball.rainbow = false;
@@ -46,6 +50,7 @@ export const revertBallModifier = (ball, reverter) => {
     ball.vel = new Vector(0, 0);
     ball.acc = new Vector(0, 0);
     ball.appliedAcc = new Vector(0, 0);
+    ball.tailLength = blend(ball.tailLength, ball.initial.tailLength, 5);
   };
 
   return {
@@ -54,28 +59,28 @@ export const revertBallModifier = (ball, reverter) => {
   };
 };
 
-export const growingBallModifier = (ball, reverter) => {
+export const growingBallModifier = (ball, increment = 1) => {
   const activeChange = () => {
     if (model.state.reverting) return;
 
-    ball.radius = Math.max(ball.radius + 1.5, ball.radius * 1.013);
+    ball.radius += Math.max(increment, ball.radius * 0.015);
   };
 
   return {
-    passive: () => determineAction(undefined, undefined, reverter),
+    passive: () => {},
     active: activeChange,
   };
 };
 
-export const fasterBallModifier = (ball, reverter) => {
+export const fasterBallModifier = (ball, multiplier = 1.01) => {
   const activeChange = () => {
     if (model.state.reverting) return;
 
-    ball.vel = ball.vel.multiply(1.01);
+    ball.vel = ball.vel.multiply(multiplier);
   };
 
   return {
-    passive: () => determineAction(undefined, activeChange, reverter),
+    passive: () => {},
     active: activeChange,
   };
 };
@@ -137,7 +142,17 @@ export const randomGravityBallModifier = (ball, reverter) => {
   };
 };
 
-// export const followingGravityBallModifier = (ball, reverter) => {};
+export const centerGravityBallMidifier = (ball, circle) => {
+  const passiveChange = () => {
+    // ball.pos.subtract(circle.pos).draw(circle.pos.x, circle.pos.y);
+    ball.appliedAcc = ball.pos.subtract(circle.pos).unit().multiply(-0.2);
+  };
+
+  return {
+    passive: passiveChange,
+    active: () => {},
+  };
+};
 
 export const boostedBallModifier = (ball, reverter) => {
   const circle = model.state.presets[model.state.preset].objects.circles[0];
@@ -155,10 +170,11 @@ export const boostedBallModifier = (ball, reverter) => {
   };
 };
 
-export const soundBallModifier = (ball, reverter) => {
+export const soundBallModifier = (soundName) => {
+  const sound = new Sound(soundName + ".mp3");
+
   const activeChange = () => {
-    // model.state.melodies.blindingLights.playNote();
-    model.state.sounds.ballHit.play();
+    sound.play();
   };
 
   return {
@@ -167,9 +183,11 @@ export const soundBallModifier = (ball, reverter) => {
   };
 };
 
-export const growingTailBallModifier = (ball, reverter) => {
+export const melodyBallModifier = (melodyName, instrument) => {
+  const melody = new Melody(melodyName, instrument);
+
   const activeChange = () => {
-    ball.tailLength += 5;
+    melody.playNote();
   };
 
   return {
@@ -178,11 +196,46 @@ export const growingTailBallModifier = (ball, reverter) => {
   };
 };
 
-export const shrinkingCircleModifier = (circle, reverter) => {
+export const growingTailBallModifier = (ball) => {
+  const activeChange = () => {
+    ball.tailLength += 4;
+  };
+
+  return {
+    passive: () => {},
+    active: activeChange,
+  };
+};
+
+export const plinkoBallModifier = () => {
+  let previousBall;
+
+  const activeChange = (data) => {
+    // Play ball hit unrepreatedly
+    if (data.circle && previousBall !== data.circle.name) {
+      previousBall = data.circle.name;
+      // model.state.sounds.piano.play("A4");
+    }
+
+    // Play random note on wall impact
+    if (data.wall) {
+      const note = notes[Math.floor(Math.random() * 20) + 30];
+      model.state.sounds.bossBattle.play(note);
+    }
+  };
+
+  return {
+    passive: () => {},
+    active: activeChange,
+  };
+};
+
+// CIRCLES
+export const shrinkingCircleModifier = (circle, reverter, decrement = 0.1) => {
   const ball = model.state.objects.balls[0];
 
   const passiveChange = () => {
-    circle.radius -= 0.1;
+    circle.radius -= decrement / options.requestFrameCount;
   };
 
   const revert = () => {
@@ -190,19 +243,50 @@ export const shrinkingCircleModifier = (circle, reverter) => {
     circle.radius = blend(circle.radius, circle.initial.radius, 1);
   };
 
-  const activeChange = () => {
-    if (model.state.reverting) return;
+  return {
+    passive: () => determineAction(passiveChange, revert, reverter),
+    active: () => {},
+  };
+};
 
-    circle.radius += 2.35;
+export const shrinkCircleModifier = (circle) => {
+  const activeChange = () => {
+    const circles = model.state.presets[model.state.preset].objects.circles;
+    const innerCircle = circles[circles.length - 2];
+
+    if (circle.radius > innerCircle.radius) {
+      circle.radius -= 10;
+    } else {
+      circle.radius = innerCircle.radius + 10;
+      circle.vel = new Vector(0, 0);
+      circle.appliedAcc = new Vector(0, 0);
+      circle.pos = innerCircle.pos;
+
+      // Spawn next circle
+    }
   };
 
   return {
-    passive: () => determineAction(passiveChange, revert, reverter),
+    passive: () => {},
     active: activeChange,
   };
 };
 
-export const plinkoWallModifier = (wall, createNewBall) => {
+export const growCircleModifier = (circle, increment = 2) => {
+  const activeChange = () => {
+    if (model.state.reverting) return;
+
+    circle.radius += increment;
+  };
+
+  return {
+    passive: () => {},
+    active: activeChange,
+  };
+};
+
+// WALLS
+export const plinkoWallModifier = (createNewBall) => {
   const maxBalls = 1000;
 
   const reverter = () => {
@@ -250,29 +334,6 @@ export const plinkoRemoveBallWallModifier = (wall) => {
 
     // Delete ball
     preset.objects.balls.splice(data.ballIndex, 1);
-  };
-
-  return {
-    passive: () => {},
-    active: activeChange,
-  };
-};
-
-export const plinkoBallModifier = (ball) => {
-  let previousBall;
-
-  const activeChange = (data) => {
-    // Play ball hit unrepreatedly
-    if (data.circle && previousBall !== data.circle.name) {
-      previousBall = data.circle.name;
-      model.state.sounds.ballHit.play();
-    }
-
-    // Play random note on wall impact
-    if (data.wall) {
-      const note = notes[Math.floor(Math.random() * 20) + 30];
-      model.state.sounds.bossBattle.play(note);
-    }
   };
 
   return {
