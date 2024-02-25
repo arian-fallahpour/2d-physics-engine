@@ -1,32 +1,25 @@
-import canvas from "./classes/Canvas";
-import frameHandler from "./controllers/frameController";
-import { deserialize, serialize } from "./helper";
+import Preset from "./classes/Preset";
+import {
+  requestNextFrame,
+  resetFrameMetrics,
+} from "./controllers/frameController";
 
 export const state = {
-  objects: {
-    balls: [],
-    walls: [],
-    circles: [],
-    vectors: [],
-    fractals: [],
-  },
   play: false,
+  step: false,
   collisions: 0,
   presets: [],
-  preset: 0,
+  presetIndex: 0,
+  preset: null,
   sounds: {},
   melodies: {},
   reverting: false,
-  fractalsAngle: 0,
-  fractalsDirection: +0.5,
-  options: {
-    requestFrameCount: 1, // Higher velue makes simulation more accurate, but is more resource intensive
-  },
 };
 
-/** Increments collisions in state */
-export const collided = () => {
-  state.collisions += 1;
+export const play = () => {
+  state.play = true;
+  document.querySelector(".button-play").textContent = "⏸️";
+  requestNextFrame();
 };
 
 export const pause = () => {
@@ -34,40 +27,51 @@ export const pause = () => {
   document.querySelector(".button-play").textContent = "▶️";
 };
 
-export const play = () => {
+export const step = () => {
   state.play = true;
-  document.querySelector(".button-play").textContent = "⏸️";
+  state.step = true;
+  requestNextFrame();
+};
+
+export const loadPresets = (...presets) => {
+  state.presets = presets;
+};
+
+export const loadPreset = () => {
+  setPreset();
+  resetFrameMetrics();
+
+  requestNextFrame(true);
+};
+
+export const setPreset = (index = state.presetIndex) => {
+  const args = state.presets[index];
+  state.preset = new Preset(args);
 };
 
 /** Sets current state as the next preset */
 export const nextPreset = () => {
   pause();
 
-  // Reset last state
-  state.presets[state.preset].reset();
+  // Go to next preset
+  state.presetIndex = (state.presetIndex + 1) % state.presets.length;
 
-  // Pause engine and skip to next frame
-  canvas.clear();
-  requestAnimationFrame(frameHandler);
-
-  state.preset = (state.preset + 1) % state.presets.length;
+  // Set next preset
+  loadPreset();
 };
 
 /** Sets current state as the previous preset */
 export const previousPreset = () => {
   pause();
 
-  // Reset last state
-  state.presets[state.preset].reset();
+  // Go to previous preset
+  state.presetIndex =
+    (state.presetIndex - 1 + state.presets.length) % state.presets.length;
 
-  // Pause engine and skip to next frame
-  canvas.clear();
-  requestAnimationFrame(frameHandler);
-
-  state.preset =
-    (state.preset - 1 + state.presets.length) % state.presets.length;
+  // Set previous preset
+  loadPreset();
 };
 
 export const resetState = () => {
-  state.presets[state.preset].reset();
+  loadPreset();
 };

@@ -10,7 +10,8 @@ export const isBallBallPenetrating = (ball1, ball2) => {
 export const isBallWallPenetrating = (ball, wall) => {
   const closestPoint = wall.closestPointTo(ball.pos);
   const distance = closestPoint.subtract(ball.pos);
-  return ball.radius >= distance.magnitude();
+
+  return ball.radius + (wall.thickness - 1) / 2 >= distance.magnitude();
 };
 
 export const isBallCirclePenetrating = (ball, circle) => {
@@ -23,7 +24,7 @@ export const isBallCirclePenetrating = (ball, circle) => {
   }
 
   // Case 2: Anywhere other than center of circle
-  return ball.radius >= distance.magnitude();
+  return ball.radius + circle.thickness / 2 >= distance.magnitude();
 };
 
 export const isCircleCirclePenetrating = (circle1, circle2) => {
@@ -32,7 +33,6 @@ export const isCircleCirclePenetrating = (circle1, circle2) => {
 
   const closestPoint = largerCircle.closestPointTo(smallerCircle.pos);
   const distance = closestPoint.subtract(smallerCircle.pos);
-  console.log(distance);
 
   // Case 1: Ball is at center of circle
   if (distance.magnitude() === 0) {
@@ -71,10 +71,11 @@ export const resolveBallWallPenetration = (ball, wall) => {
   const distance = closestPoint.subtract(ball.pos);
   const normal = distance.unit();
 
-  let penetrationDepth = ball.radius - distance.magnitude();
+  let penetrationDepth =
+    ball.radius + (wall.thickness - 1) / 2 - distance.magnitude();
 
   // Account for collisions that occur between frames
-  penetrationDepth += (fps / 1000) * ball.vel.magnitude();
+  // penetrationDepth += (fps / 1000) * ball.vel.magnitude();
 
   const resolution = normal.multiply(penetrationDepth);
 
@@ -85,7 +86,8 @@ export const resolveBallCirclePenetration = (ball, circle) => {
   const closestPoint = circle.closestPointTo(ball.pos);
   const distance = closestPoint.subtract(ball.pos);
 
-  let penetrationDepth = ball.radius - distance.magnitude();
+  let penetrationDepth =
+    ball.radius + circle.thickness / 2 - distance.magnitude();
 
   // Account for collisions that occur between frames
   penetrationDepth += (fps / 1000) * ball.vel.magnitude();

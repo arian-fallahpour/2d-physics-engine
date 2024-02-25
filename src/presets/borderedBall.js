@@ -1,32 +1,28 @@
-import canvas from "../classes/Canvas";
-
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
 import Ball from "../classes/objects/Ball";
 import Wall from "../classes/objects/Wall";
 
-const borderedBall = new Preset("bordered ball");
-
-borderedBall.init((preset) => {
+const initializer = (preset) => {
   // Create walls
-  const boundsHeight = canvas.element.clientHeight;
-  const boundsWidth = canvas.element.clientHeight * (9 / 16);
+  const boundsWidth = preset.canvas.element.clientWidth;
+  const boundsHeight = preset.canvas.element.clientHeight;
   const edges = [
     new Vector(
-      canvas.element.clientWidth / 2 - boundsWidth / 2,
-      canvas.element.clientHeight / 2 - boundsHeight / 2
+      preset.canvas.element.clientWidth / 2 - boundsWidth / 2,
+      preset.canvas.element.clientHeight / 2 - boundsHeight / 2
     ),
     new Vector(
-      canvas.element.clientWidth / 2 - boundsWidth / 2,
-      canvas.element.clientHeight / 2 + boundsHeight / 2
+      preset.canvas.element.clientWidth / 2 - boundsWidth / 2,
+      preset.canvas.element.clientHeight / 2 + boundsHeight / 2
     ),
     new Vector(
-      canvas.element.clientWidth / 2 + boundsWidth / 2,
-      canvas.element.clientHeight / 2 + boundsHeight / 2
+      preset.canvas.element.clientWidth / 2 + boundsWidth / 2,
+      preset.canvas.element.clientHeight / 2 + boundsHeight / 2
     ),
     new Vector(
-      canvas.element.clientWidth / 2 + boundsWidth / 2,
-      canvas.element.clientHeight / 2 - boundsHeight / 2
+      preset.canvas.element.clientWidth / 2 + boundsWidth / 2,
+      preset.canvas.element.clientHeight / 2 - boundsHeight / 2
     ),
   ];
   const bounds = [];
@@ -36,7 +32,7 @@ borderedBall.init((preset) => {
         start: edges[i],
         end: edges[(i + 1) % edges.length],
         color: "white",
-        elasticity: 0,
+        // elasticity: 0,
       })
     );
   }
@@ -44,30 +40,41 @@ borderedBall.init((preset) => {
 
   const ball1 = new Ball({
     pos: new Vector(
-      canvas.element.clientWidth / 2 - 50,
-      canvas.element.clientHeight / 2
+      preset.canvas.element.clientWidth / 2,
+      preset.canvas.element.clientHeight / 2
     ),
     color: "red",
     controls: true,
-    mass: 100,
+    mass: 0,
+    friction: 0.1,
   });
 
-  const ballsCount = 10;
+  preset.canvas.focusOn(ball1);
+
+  const ballsCount = 1000;
   const balls = [];
   for (let i = 0; i < ballsCount; i++) {
     balls.push(
       new Ball({
         pos: new Vector(
-          canvas.element.clientWidth / 2 + Math.random() * 50,
-          canvas.element.clientHeight / 2 + Math.random() * 50
+          preset.canvas.element.clientWidth / 2 + 300 * Math.random() - 150,
+          preset.canvas.element.clientHeight / 2 + 300 * Math.random() - 150
         ),
         color: "blue",
-        appliedAcc: new Vector(0, -0.2),
+        radius: 5,
+        elasticity: 1,
+        // friction: 0.1,
+        // appliedAcc: new Vector(0, -0.2),
       })
     );
   }
 
   preset.addObjects("balls", ball1, ...balls);
+};
+
+const borderedBall = new Preset({
+  name: "bordered ball",
+  initializer,
 });
 
 export default borderedBall;

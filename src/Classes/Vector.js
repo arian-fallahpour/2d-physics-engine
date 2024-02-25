@@ -1,10 +1,9 @@
-import canvas from "./Canvas";
+import { state } from "../model";
 
 class Vector {
-  constructor(x, y, pos) {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.pos = pos;
   }
 
   magnitude() {
@@ -12,19 +11,19 @@ class Vector {
   }
 
   add(vector) {
-    return new Vector(this.x + vector.x, this.y + vector.y, this.pos);
+    return new Vector(this.x + vector.x, this.y + vector.y);
   }
 
   subtract(vector) {
-    return new Vector(this.x - vector.x, this.y - vector.y, this.pos);
+    return new Vector(this.x - vector.x, this.y - vector.y);
   }
 
   multiply(scalar) {
-    return new Vector(this.x * scalar, this.y * scalar, this.pos);
+    return new Vector(this.x * scalar, this.y * scalar);
   }
 
   divide(scalar) {
-    return new Vector(this.x / scalar, this.y / scalar, this.pos);
+    return new Vector(this.x / scalar, this.y / scalar);
   }
 
   unit() {
@@ -36,14 +35,16 @@ class Vector {
   }
 
   normal() {
-    return new Vector(-this.y, this.x, this.pos);
+    return new Vector(-this.y, this.x);
   }
 
   dot(vector) {
     return this.x * vector.x + this.y * vector.y;
   }
 
-  draw(x = this.pos.x, y = this.pos.y, color = "white", factor = 1) {
+  draw(x, y, color = "white", factor = 1) {
+    const { canvas } = state.preset;
+
     canvas.ctx.beginPath();
     canvas.ctx.moveTo(x, canvas.toCanvasY(y));
     canvas.ctx.lineTo(
@@ -58,11 +59,11 @@ class Vector {
     const x = this.x * Math.cos(radians) - this.y * Math.sin(radians);
     const y = this.x * Math.sin(radians) + this.y * Math.cos(radians);
 
-    return new Vector(x, y, this.pos);
+    return new Vector(x, y);
   }
 
-  setPos(vector) {
-    return new Vector(this.x, this.y, vector);
+  angle() {
+    return Math.atan(this.y / this.x);
   }
 }
 

@@ -3,7 +3,7 @@ import { Howl } from "howler";
 class Sound {
   constructor(file, sprite) {
     this.sound = new Howl({
-      src: [`src/sounds/${file}`],
+      src: [`src/sounds/${file}.mp3`],
       volume: 0.15,
       sprite,
     });

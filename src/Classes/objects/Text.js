@@ -1,4 +1,4 @@
-import canvas from "../Canvas";
+import { state } from "../../model";
 import Entity from "./Entity";
 
 class Text extends Entity {
@@ -18,11 +18,16 @@ class Text extends Entity {
     this.centered = centered;
     this.fontSize = fontSize;
     this.fontFamily = fontFamily;
+
+    // InitialState
+    this.setInitial();
   }
 
   draw() {
+    const { canvas } = state.preset;
+
     canvas.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-    canvas.ctx.fillStyle = this._colors.fill;
+    canvas.ctx.fillStyle = this.getColor("fill");
 
     if (this.centered) {
       canvas.ctx.textBaseline = "middle";

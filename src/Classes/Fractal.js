@@ -1,19 +1,25 @@
-import canvas from "./Canvas";
 import Vector from "./Vector";
+import Entity from "./objects/Entity";
 
-class Fractal {
+class Fractal extends Entity {
   vectors = [];
 
   constructor({
     branches = 2,
+    baseLength = 100,
     layers = 4,
     angle = Math.PI / 6,
-    pos = new Vector(0, 0),
+    ...otherArgs
   }) {
+    super(otherArgs);
+
     this.branches = branches;
+    this.baseLength = baseLength;
     this.layers = layers;
     this.angle = angle;
-    this.pos = pos;
+
+    // InitialState
+    this.setInitial();
   }
 
   /** Constructs fractals and their positions */
@@ -25,7 +31,7 @@ class Fractal {
     for (let i = 0; i < this.layers; i++) {
       // Initial layer
       if (i === 0) {
-        const v = new Vector(0, 100, this.pos);
+        const v = new Vector(0, this.baseLength, this.pos);
         this.vectors.push([v]);
         continue;
       }

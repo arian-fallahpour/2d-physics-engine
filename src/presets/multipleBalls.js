@@ -6,26 +6,26 @@ import Circle from "../classes/objects/Circle";
 import Vector from "../classes/Vector";
 
 import {
+  boostedBallModifier,
   fasterBallModifier,
   growingBallModifier,
-  melodyBallModifier,
+  melodyModifier,
   revertBallModifier,
-  soundBallModifier,
+  soundModifier,
 } from "../controllers/modifierController";
 
-const multipleBalls = new Preset("multiple balls");
-
-multipleBalls.init((preset) => {
+const initializer = (preset) => {
   const circleRadius = 200;
-  const ballRadius = 15;
+  const ballRadius = 10;
+  const ballsCount = 40;
   const initialHeight = 20;
   const initialVelocity = 5;
 
   // Create circles
   const circle = new Circle({
     pos: new Vector(
-      canvas.element.clientWidth / 2,
-      canvas.element.clientHeight / 2
+      preset.canvas.element.clientWidth / 2,
+      preset.canvas.element.clientHeight / 2
     ),
     radius: circleRadius,
     mass: 0,
@@ -35,15 +35,14 @@ multipleBalls.init((preset) => {
 
   // Create ball
   const balls = [];
-  const ballsCount = 5;
   for (let i = 0; i < ballsCount; i++) {
     const distanceFromCenter = circleRadius - ballRadius - initialHeight;
     const posRotation = new Vector(0, distanceFromCenter).rotate(
       2 * Math.PI * (i / ballsCount)
     );
     const pos = new Vector(
-      canvas.element.clientWidth / 2,
-      canvas.element.clientHeight / 2
+      preset.canvas.element.clientWidth / 2,
+      preset.canvas.element.clientHeight / 2
     ).add(posRotation);
     const vel = new Vector(initialVelocity, 0).rotate(
       2 * Math.PI * (i / ballsCount)
@@ -58,19 +57,25 @@ multipleBalls.init((preset) => {
       vel,
     });
 
-    const reverter = () => circle.radius <= ball.radius + 5;
-    ball.addModifier(revertBallModifier(ball, reverter));
-    ball.addModifier(growingBallModifier(ball));
-    ball.addModifier(fasterBallModifier(ball, 1.01));
+    // const reverter = () => circle.radius <= ball.radius + 5;
+    // ball.addModifier(revertBallModifier(ball, reverter));
+    // ball.addModifier(growingBallModifier(ball, 1.25));
+    // ball.addModifier(fasterBallModifier(ball, 1.01));
+    // ball.addModifier(boostedBallModifier(ball, circle));
 
     // Add sound to one ball only
-    if (i === 0) {
-      ball.addModifier(melodyBallModifier("axelF"));
-    }
+    // if (i === 0) {
+    // ball.addModifier(melodyModifier("sad", "drop-synth"));
+    // }
 
     balls.push(ball);
   }
   preset.addObjects("balls", ...balls);
+};
+
+const multipleBalls = new Preset({
+  name: "multiple balls",
+  initializer,
 });
 
 export default multipleBalls;

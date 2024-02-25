@@ -2,10 +2,7 @@ import "./style.css";
 
 import * as model from "./model";
 
-import canvas from "./classes/Canvas";
-
 import eventHandler from "./controllers/eventController";
-import frameHandler from "./controllers/frameController";
 
 import singleBall from "./presets/singleBall";
 import multipleBalls from "./presets/multipleBalls";
@@ -14,26 +11,28 @@ import plinko from "./presets/plinko";
 import chaosTheory from "./presets/chaosTheory";
 import circularBalls from "./presets/circularBalls";
 import bouncingCircles from "./presets/bouncingCircles";
+import fractalOpen from "./presets/fractalOpen";
+import platforms from "./presets/platforms";
 
 const main = () => {
-  canvas.mode = "normal";
-
-  // Push presets to state
-  model.state.presets.push(
-    bouncingCircles,
+  // Load presets
+  model.loadPresets(
+    platforms,
     singleBall,
-    borderedBall,
-    circularBalls,
     multipleBalls,
+    borderedBall,
+    fractalOpen,
+    circularBalls,
+    plinko,
     chaosTheory,
-    plinko
+    bouncingCircles
   );
+
+  // Load current preset
+  model.loadPreset();
 
   // Handle events
   eventHandler();
-
-  // Call first frame
-  requestAnimationFrame(frameHandler);
 };
 
 main();

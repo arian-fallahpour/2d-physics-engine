@@ -1,6 +1,20 @@
+import Canvas from "./Canvas";
+
 class Preset {
-  constructor(name = `preset-${Math.random()}-${Date.now()}`) {
+  initialized = false;
+  _modifiers = {
+    before: [],
+    after: [],
+  };
+
+  constructor({
+    name = `preset-${Math.random()}-${Date.now()}`,
+    initializer = function () {},
+    canvas = {},
+  }) {
     this.name = name;
+    this.canvas = new Canvas(canvas);
+    this.initializer = initializer;
 
     this.objects = {
       balls: [],
@@ -10,23 +24,29 @@ class Preset {
       vectors: [],
       texts: [],
     };
+
+    this.init();
   }
 
-  /** Allows modification of preset */
-  init(fn) {
-    fn(this);
+  init() {
+    this.initializer(this);
+    this.initialized = true;
   }
 
-  /** Resets entire preset to initial state */
-  reset() {
-    Object.keys(this.objects).forEach((key) =>
-      this.objects[key].forEach((obj) => obj.reset())
-    );
-  }
-
-  /** Pushes multiple objects of same type */
   addObjects(type, ...objects) {
     this.objects[type].push(...objects);
+  }
+
+  popObjects(type) {
+    this.objects[type].pop();
+  }
+
+  addModifier(modifier) {
+    this._modifiers[modifier.occurance].push(modifier);
+  }
+
+  modify(occcurance) {
+    this._modifiers[occcurance].forEach((modifier) => modifier.apply(this));
   }
 }
 

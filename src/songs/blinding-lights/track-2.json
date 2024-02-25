@@ -1,0 +1,65 @@
+{
+  "positions": [
+    {
+      "x": 293.25,
+      "y": 40.99999999999993
+    },
+    {
+      "x": 1013.25,
+      "y": -2836.0002500000223
+    },
+    {
+      "x": 1733.25,
+      "y": 40.99949999999967
+    }
+  ],
+  "peaks": [
+    {
+      "x": 474,
+      "y": 399.49975
+    },
+    {
+      "x": 1554,
+      "y": 399.4994999999998
+    },
+    {
+      "x": 1914.75,
+      "y": 399.4867499999998
+    }
+  ],
+  "wallsData": [
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 474.25,
+      "noteName": "A3",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 26.499749999999928,
+      "start": 114
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1554.25,
+      "noteName": "E2",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": -2850.5005000000224,
+      "start": 474
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1915.75,
+      "noteName": "E2",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 26.49924999999967,
+      "start": 1554
+    }
+  ]
+}

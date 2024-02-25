@@ -1,4 +1,4 @@
-import canvas from "../Canvas";
+import { state } from "../../model";
 import Entity from "./Entity";
 
 class Circle extends Entity {
@@ -14,7 +14,10 @@ class Circle extends Entity {
   }
 
   draw() {
+    const { canvas } = state.preset;
+
     canvas.ctx.beginPath();
+    canvas.ctx.lineWidth = this.thickness;
     canvas.ctx.arc(
       this.pos.x,
       canvas.toCanvasY(this.pos.y),
@@ -22,9 +25,10 @@ class Circle extends Entity {
       0,
       2 * Math.PI
     );
-    canvas.ctx.strokeStyle = this._colors.border;
+    canvas.ctx.strokeWidth = this.thickness;
+    canvas.ctx.strokeStyle = this.getColor("stroke");
     canvas.ctx.stroke();
-    canvas.ctx.fillStyle = this._colors.fill;
+    canvas.ctx.fillStyle = this.getColor("fill");
     canvas.ctx.fill();
 
     this.reposition();

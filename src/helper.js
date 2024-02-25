@@ -29,3 +29,10 @@ export function deserialize(str) {
     return value;
   });
 }
+
+export function transition(step, duration, initial, final) {
+  if (initial === final) {
+    return initial;
+  }
+  return initial + (step / duration) * (final - initial);
+}

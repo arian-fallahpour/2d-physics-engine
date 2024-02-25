@@ -1,11 +1,9 @@
-import canvas from "../Canvas";
+import { state } from "../../model";
 import Vector from "../Vector";
 
 import Entity from "./Entity";
 
 import options from "../../data/options";
-
-const fps = 60;
 
 class Ball extends Entity {
   _moving = {
@@ -27,16 +25,9 @@ class Ball extends Entity {
   }) {
     super(otherArgs);
 
-    // Vectors
-
-    // Scalars
     this.radius = radius;
     this.tailLength = tailLength;
-
-    // Other Info
     this.image = image;
-
-    // Settings
     this.controls = controls;
 
     if (this.controls) {
@@ -52,41 +43,26 @@ class Ball extends Entity {
     this.setInitial();
   }
 
-  showTail() {
-    const data = {
-      pos: this.pos,
-      radius: this.radius,
-      color: this._colors.fill,
-      borderColor: this._colors.border,
-    };
-
-    // Add newest segment
-    this._tail.push(data);
-
-    // Remove oldest segment if more than this.tailLength
-    if (this.tailLength !== -1 && this._tail.length > this.tailLength) {
-      this._tail.splice(0, 1);
-    }
-
-    // Render tail
-    this._tail.forEach((segment) => {
-      this.drawCircle(segment);
-    });
-  }
-
   // DRAW FUNCTIONS
   draw() {
     // Leave trail behind
     if (this.tailLength !== 0) {
-      this.showTail();
+      this.drawTail();
+    }
+
+    // Draw shadow
+    if (this.shadowColor !== "transparent") {
+      this.drawShadow();
     }
 
     // Draw circle
     this.drawCircle({
       pos: this.pos,
       radius: this.radius,
-      color: this._colors.fill,
-      borderColor: this._colors.border,
+      color: this.getColor("fill"),
+      strokeColor: this.getColor("stroke"),
+      shadowColor: this.getColor("shadow"),
+      shadowLength: this.shadowLength,
     });
 
     // Draw image if exists
@@ -108,21 +84,79 @@ class Ball extends Entity {
     }
   }
 
-  drawCircle({ pos, radius, color, borderColor }) {
-    canvas.ctx.beginPath();
-    canvas.ctx.arc(pos.x, canvas.toCanvasY(pos.y), radius, 0, 2 * Math.PI);
-    canvas.ctx.fillStyle = color;
-    canvas.ctx.strokeStyle = borderColor;
-    canvas.ctx.fill();
-    canvas.ctx.stroke();
+  drawTail() {
+    const data = {
+      pos: this.pos,
+      radius: this.radius,
+      color: this.getColor("fill"),
+      strokeColor: this.getColor("stroke"),
+      thickness: this.thickness,
+    };
+
+    // Throttle to 60 times a second
+    if ((this._frame + 35) % options.requestFrameCount === 0) {
+      // Add newest segment
+      this._tail.push(data);
+
+      // Remove oldest segment if more than this.tailLength
+      if (this.tailLength !== -1 && this._tail.length > this.tailLength) {
+        this._tail.splice(0, 1);
+      }
+    }
+
+    // Render tail
+    this._tail.forEach((segment) => {
+      this.drawCircle(segment);
+    });
   }
 
-  drawVectors() {
-    this.vel
-      .unit()
-      .multiply(2 * this.radius)
-      .draw(this.pos.x, this.pos.y, "blue");
-    this.acc.unit().multiply(this.radius).draw(this.pos.x, this.pos.y, "red");
+  drawShadow() {
+    const { canvas } = state.preset;
+
+    canvas.ctx.beginPath();
+
+    const inner = Math.min(this.shadowLength, this.radius);
+    const outer = this.shadowLength;
+    const gradient = canvas.ctx.createRadialGradient(
+      this.pos.x,
+      canvas.toCanvasY(this.pos.y),
+      this.radius - inner,
+      this.pos.x,
+      canvas.toCanvasY(this.pos.y),
+      this.radius + outer
+    );
+
+    gradient.addColorStop(0, "transparent");
+    gradient.addColorStop(inner / (inner + outer), this.getColor("shadow"));
+    gradient.addColorStop(1, "transparent");
+
+    canvas.ctx.arc(
+      this.pos.x,
+      canvas.toCanvasY(this.pos.y),
+      this.radius + outer,
+      0,
+      2 * Math.PI
+    );
+    canvas.ctx.fillStyle = gradient;
+    canvas.ctx.fill();
+
+    canvas.ctx.closePath();
+  }
+
+  drawCircle({ pos, radius, color, strokeColor, thickness }) {
+    const { canvas } = state.preset;
+
+    canvas.ctx.beginPath();
+
+    canvas.ctx.arc(pos.x, canvas.toCanvasY(pos.y), radius, 0, 2 * Math.PI);
+    canvas.ctx.fillStyle = color;
+    canvas.ctx.fill();
+
+    canvas.ctx.strokeStyle = strokeColor;
+    canvas.ctx.strokeWidth = thickness;
+    canvas.ctx.stroke();
+
+    canvas.ctx.closePath();
   }
 
   loadImage() {
@@ -132,6 +166,8 @@ class Ball extends Entity {
   }
 
   drawImage(onLoad = false) {
+    const { canvas } = state.preset;
+
     canvas.ctx.save();
 
     const x =
@@ -143,7 +179,7 @@ class Ball extends Entity {
     canvas.ctx.arc(
       x,
       canvas.toCanvasY(y),
-      this.radius - (this.borderColor === "transparent" ? 0 : 1 / 2),
+      this.radius - (this.strokeColor === "transparent" ? 0 : 1 / 2),
       0,
       Math.PI * 2,
       false
@@ -161,8 +197,17 @@ class Ball extends Entity {
     canvas.ctx.restore();
   }
 
-  /** Draws properties provided in argument */
+  drawVectors() {
+    this.vel
+      .unit()
+      .multiply(2 * this.radius)
+      .draw(this.pos.x, this.pos.y, "blue");
+    this.acc.unit().multiply(this.radius).draw(this.pos.x, this.pos.y, "red");
+  }
+
   drawInfo() {
+    const { canvas } = state.preset;
+
     const fontSize = 15;
     const lineHeight = 15;
 
@@ -214,7 +259,6 @@ class Ball extends Entity {
     });
   }
 
-  // POSITION FUNCTIONS
   reposition() {
     this.acc = this.appliedAcc.add(this._moving.acc);
     this.vel = this.vel

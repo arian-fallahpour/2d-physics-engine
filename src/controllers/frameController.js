@@ -1,11 +1,8 @@
-import canvas from "../classes/Canvas";
-
-import * as model from "../model";
+import { state } from "../model";
 
 import options from "../data/options";
 import engine from "../data/engine";
 import Entity from "../classes/objects/Entity";
-
 import {
   isBallBallPenetrating,
   isBallWallPenetrating,
@@ -22,35 +19,41 @@ import {
 } from "./collisionController";
 
 const frameHandler = (timeMs) => {
-  const { state } = model;
+  // Only render frame if in play state, or paused on the first frame
+  if (!state.play && engine.frame !== 0 && !state.step) return;
+  if (state.step) {
+    state.step = false;
+    state.play = false;
+  }
 
+  // Calculate frame metrics
   calculateFrameMetrics(timeMs);
 
-  // Clear Canvas for next frame
-  canvas.prepare();
-
   // Get current preset
-  const preset = state.presets[state.preset];
+  const preset = state.preset;
+  const { walls, balls, circles, fractals, texts } = preset.objects;
+
+  // Apply modifiers before render
+  preset.modify("before");
+
+  // Clear Canvas for next frame
+  preset.canvas.prepare();
 
   // Render objects
-  Entity.render(preset.objects.walls);
-  Entity.render(preset.objects.fractals);
-  Entity.render(preset.objects.texts);
+  Entity.render(walls);
+  Entity.render(fractals);
+  Entity.render(texts);
 
-  Entity.render(preset.objects.circles, (circle1, i) => {
-    preset.objects.circles.forEach((circle2, j) => {
+  Entity.render(circles, (circle1, i) => {
+    circles.forEach((circle2, j) => {
       if (i === j) return; // If same circle
       if (i < j) return; // If resolution has already been calculated
 
       const isPenetrating = isCircleCirclePenetrating(circle1, circle2);
       if (!isPenetrating) return;
 
-      const data = {
-        circle1,
-        circle2,
-        circle1Index: i,
-        circle2Index: j,
-      };
+      const data = { circle1, circle2, circle1Index: i, circle2Index: j };
+
       circle1.modify("active", data);
       circle2.modify("active", data);
 
@@ -59,40 +62,30 @@ const frameHandler = (timeMs) => {
     });
   });
 
-  Entity.render(preset.objects.balls, (ball1, i) => {
+  Entity.render(balls, (ball1, i) => {
     // Check if penetrating any other balls
-    preset.objects.balls.forEach((ball2, j) => {
-      if (i === j) return; // If same ball
-      if (i < j) return; // If resolution has already been calculated
+    // balls.forEach((ball2, j) => {
+    //   if (i === j) return; // If same ball
+    //   if (i < j) return; // If resolution has already been calculated
 
-      const isPenetrating = isBallBallPenetrating(ball1, ball2);
-      if (!isPenetrating) return;
+    //   const isPenetrating = isBallBallPenetrating(ball1, ball2);
+    //   if (!isPenetrating) return;
 
-      const data = {
-        ball1,
-        ball2,
-        ball1Index: i,
-        ball2Index: j,
-      };
+    //   const data = { ball1, ball2, ball1Index: i, ball2Index: j };
 
-      ball1.modify("active", data);
-      ball2.modify("active", data);
+    //   ball1.modify("active", data);
+    //   ball2.modify("active", data);
 
-      resolveBallBallPenetration(ball1, ball2);
-      resolveBallBallCollision(ball1, ball2);
-    });
+    //   resolveBallBallPenetration(ball1, ball2);
+    //   resolveBallBallCollision(ball1, ball2);
+    // });
 
     // Check if penetrating any circles
-    preset.objects.circles.forEach((circle, j) => {
+    circles.forEach((circle, j) => {
       const isPenetrating = isBallCirclePenetrating(ball1, circle);
       if (!isPenetrating) return;
 
-      const data = {
-        circle,
-        ball: ball1,
-        ballIndex: i,
-        circleIndex: j,
-      };
+      const data = { circle, ball: ball1, ballIndex: i, circleIndex: j };
 
       ball1.modify("active", data);
       circle.modify("active", data);
@@ -102,16 +95,11 @@ const frameHandler = (timeMs) => {
     });
 
     // Check if penetrating any walls
-    preset.objects.walls.forEach((wall, j) => {
+    walls.forEach((wall, j) => {
       const isPenetrating = isBallWallPenetrating(ball1, wall);
       if (!isPenetrating) return;
 
-      const data = {
-        ball: ball1,
-        wall,
-        ballIndex: i,
-        wallIndex: j,
-      };
+      const data = { ball: ball1, wall, ballIndex: i, wallIndex: j };
 
       ball1.modify("active", data);
       wall.modify("active", data);
@@ -121,24 +109,25 @@ const frameHandler = (timeMs) => {
     });
   });
 
-  // Request next frame if in play state
-  requestNextFrame(true);
+  // Apply modifiers after render
+  preset.modify("after");
+
+  // Request next frame
+  requestAnimationFrame(frameHandler);
 };
 
-export const requestNextFrame = (insideLoop = true) => {
-  const { state } = model;
-
-  // Call one frame (next frame) only, if inside the mainLoop
-  if (insideLoop) {
+export const requestNextFrame = (firstFrame = false) => {
+  // Call the number of frames defined in options if not only calling first frame
+  if (!firstFrame) {
     if (!state.play) return;
-    requestAnimationFrame(frameHandler);
+
+    for (let i = 0; i < options.requestFrameCount; i++) {
+      requestAnimationFrame(frameHandler);
+    }
     return;
   }
 
-  // Call the number of frames defined in options
-  for (let i = 0; i < options.requestFrameCount; i++) {
-    requestAnimationFrame(frameHandler);
-  }
+  requestAnimationFrame(frameHandler);
 };
 
 const calculateFrameMetrics = (timeMs) => {
@@ -152,6 +141,13 @@ const calculateFrameMetrics = (timeMs) => {
   }
 
   engine.frame += 1;
+};
+
+export const resetFrameMetrics = () => {
+  engine.frame = 0;
+  engine.frameTime = 0;
+  engine.framesPerSecond = 0;
+  engine.timeMs = 0;
 };
 
 export default frameHandler;

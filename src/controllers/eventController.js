@@ -1,5 +1,4 @@
 import * as model from "../model";
-
 import { requestNextFrame } from "./frameController";
 
 const eventHandler = () => {
@@ -13,7 +12,6 @@ const eventHandler = () => {
       }
 
       model.play();
-      requestNextFrame(false);
     }
 
     // Reset button
@@ -29,6 +27,11 @@ const eventHandler = () => {
     // Previous preset button
     if (e.target.classList.contains("button-previous")) {
       model.previousPreset();
+    }
+
+    // Step one frame
+    if (e.target.classList.contains("button-step")) {
+      model.step();
     }
   });
 };

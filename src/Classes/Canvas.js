@@ -1,14 +1,19 @@
+import convert from "color-convert";
 import engine from "../data/engine";
 import options from "../data/options";
+import Vector from "./Vector";
+
+const dpr = window.devicePixelRatio;
 
 class Canvas {
+  focused;
+  translated = new Vector(0, 0);
+
   constructor({ backgroundColor = "black", mode = "normal" }) {
     this.element = document.getElementById("canvas");
     this.ctx = this.element.getContext("2d");
     this.backgroundColor = backgroundColor;
     this.mode = mode;
-
-    const dpr = window.devicePixelRatio;
 
     // Set Dimensions
     this.element.width = window.innerWidth * dpr;
@@ -25,20 +30,45 @@ class Canvas {
   fillCanvas(color = this.backgroundColor) {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(
-      0,
-      0,
+      -this.translated.x,
+      -this.translated.y,
       this.element.clientWidth,
       this.element.clientHeight
     );
   }
 
+  resetTransform() {
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.scale(dpr, dpr);
+  }
+
+  reset() {
+    this.clear();
+
+    this.resetTransform();
+  }
+
   prepare() {
+    if (this.focused) {
+      this.resetTransform();
+
+      const translation = new Vector(
+        (this.focused.pos.x - this.element.clientWidth / 2) * -1,
+        this.focused.pos.y - this.element.clientHeight / 2
+      );
+      this.translated = translation;
+
+      this.ctx.translate(translation.x, translation.y);
+    }
+
+    const rgb = convert.keyword.rgb(this.backgroundColor);
+
     const modes = {
-      normal: "rgba(0,0,0,1)",
-      lucid: `rgba(0,0,0,${
+      normal: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 1)`,
+      lucid: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${
         engine.frame % options.requestFrameCount === 0 ? 0.1 : 0
       })`,
-      trail: "rgba(0,0,0,0)",
+      trail: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0)`,
     };
 
     this.fillCanvas(modes[this.mode]);
@@ -47,8 +77,14 @@ class Canvas {
   clear() {
     this.fillCanvas(this.backgroundColor);
   }
+
+  focusOn(object) {
+    this.focused = object;
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+  }
 }
 
-const canvas = new Canvas({});
-
-export default canvas;
+export default Canvas;

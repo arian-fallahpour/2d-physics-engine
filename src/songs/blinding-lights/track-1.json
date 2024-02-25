@@ -1,0 +1,274 @@
+{
+  "positions": [
+    {
+      "x": 294,
+      "y": 37.99999999999992
+    },
+    {
+      "x": 474,
+      "y": 219.49037500000117
+    },
+    {
+      "x": 609,
+      "y": 150.68700000000013
+    },
+    {
+      "x": 654,
+      "y": 140.44890724945083
+    },
+    {
+      "x": 699,
+      "y": 131.97673153483882
+    },
+    {
+      "x": 789,
+      "y": 104.43892492532746
+    },
+    {
+      "x": 879,
+      "y": 131.97623153483883
+    },
+    {
+      "x": 1014,
+      "y": 23.428942601204284
+    },
+    {
+      "x": 1194,
+      "y": 78.73521385896224
+    },
+    {
+      "x": 1329,
+      "y": 104.43792492532748
+    },
+    {
+      "x": 1374,
+      "y": 96.05334587391077
+    },
+    {
+      "x": 1419,
+      "y": 86.79921906747721
+    },
+    {
+      "x": 1509,
+      "y": 60.83856804994494
+    },
+    {
+      "x": 1599,
+      "y": 86.79871906747722
+    }
+  ],
+  "peaks": [
+    {
+      "x": 430.5,
+      "y": 241.05912500000085
+    },
+    {
+      "x": 519.75,
+      "y": 241.0526250000008
+    },
+    {
+      "x": 622.5,
+      "y": 152.19936310577407
+    },
+    {
+      "x": 669,
+      "y": 142.47040998542323
+    },
+    {
+      "x": 731.25,
+      "y": 142.46984390795245
+    },
+    {
+      "x": 849,
+      "y": 142.46990998542324
+    },
+    {
+      "x": 911.25,
+      "y": 142.46934390795246
+    },
+    {
+      "x": 1119,
+      "y": 142.46940998542323
+    },
+    {
+      "x": 1271.25,
+      "y": 142.46884390795248
+    },
+    {
+      "x": 1344,
+      "y": 106.48763675622719
+    },
+    {
+      "x": 1388.25,
+      "y": 97.84237922110054
+    },
+    {
+      "x": 1452,
+      "y": 97.84331996030168
+    },
+    {
+      "x": 1568.25,
+      "y": 97.84187922110056
+    },
+    {
+      "x": 1632,
+      "y": 97.8428199603017
+    }
+  ],
+  "wallsData": [
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 430.75,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 0.75,
+      "y": 23.49974999999992,
+      "start": 114
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 520,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 204.99012500000117,
+      "start": 430.5
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 622.75,
+      "noteName": "C4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 0.13348388671875,
+      "y": 136.18675000000013,
+      "start": 519.75
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 669.25,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 0.421875,
+      "y": 125.94865724945083,
+      "start": 622.5
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 731.5,
+      "noteName": "E4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 117.47648153483883,
+      "start": 669
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 849.25,
+      "noteName": "A4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 89.93867492532746,
+      "start": 731.25
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 911.5,
+      "noteName": "C4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 117.47598153483884,
+      "start": 849
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1119.25,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 8.928692601204284,
+      "start": 911.25
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1271.5,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 64.23496385896225,
+      "start": 1119
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1344.25,
+      "noteName": "C4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 0.2373046875,
+      "y": 89.93767492532749,
+      "start": 1271.25
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1388.5,
+      "noteName": "D4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 0.421875,
+      "y": 81.55309587391078,
+      "start": 1344
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1452.25,
+      "noteName": "E4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 72.29896906747722,
+      "start": 1388.25
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1568.5,
+      "noteName": "A4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 46.33831804994494,
+      "start": 1452
+    },
+    {
+      "tooFast": false,
+      "prevTooFast": false,
+      "end": 1633,
+      "noteName": "C4",
+      "thickness": 10,
+      "placed": "below",
+      "elasticity": 1,
+      "y": 72.29846906747723,
+      "start": 1568.25
+    }
+  ]
+}

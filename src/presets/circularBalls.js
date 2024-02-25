@@ -6,9 +6,7 @@ import Circle from "../classes/objects/Circle";
 
 import { centerGravityBallMidifier } from "../controllers/modifierController";
 
-const circularBalls = new Preset("circular balls");
-
-circularBalls.init((preset) => {
+const initializer = (preset) => {
   const circleRadius = 200;
   const ballRadius = 10;
   const ballsCount = 10;
@@ -16,8 +14,8 @@ circularBalls.init((preset) => {
   // Create circle
   const circle = new Circle({
     pos: new Vector(
-      canvas.element.clientWidth / 2,
-      canvas.element.clientHeight / 2
+      preset.canvas.element.clientWidth / 2,
+      preset.canvas.element.clientHeight / 2
     ),
     radius: circleRadius,
     mass: 0,
@@ -41,9 +39,18 @@ circularBalls.init((preset) => {
 
     balls.push(ball);
 
-    ball.addModifier(centerGravityBallMidifier(ball, circle));
+    // ball.addModifier(centerGravityBallMidifier(ball, circle));
   }
+
+  preset.canvas.focusOn(balls[0]);
+  balls[0].color = "red";
+
   preset.addObjects("balls", ...balls);
+};
+
+const circularBalls = new Preset({
+  name: "circular balls",
+  initializer,
 });
 
 export default circularBalls;
