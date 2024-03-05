@@ -3,6 +3,7 @@ import {
   requestNextFrame,
   resetFrameMetrics,
 } from "./controllers/frameController";
+import options from "./data/options";
 
 export const state = {
   play: false,
@@ -13,6 +14,7 @@ export const state = {
   preset: null,
   sounds: {},
   melodies: {},
+  tones: {},
   reverting: false,
 };
 
@@ -28,9 +30,11 @@ export const pause = () => {
 };
 
 export const step = () => {
-  state.play = true;
-  state.step = true;
-  requestNextFrame();
+  for (let i = 0; i < options.requestFrameCount; i++) {
+    state.play = true;
+    state.step = true;
+    requestNextFrame();
+  }
 };
 
 export const loadPresets = (...presets) => {

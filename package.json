@@ -31,6 +31,7 @@
     "color-convert": "^2.0.1",
     "howler": "^2.2.4",
     "onecolor": "^4.1.0",
-    "style-loader": "^3.3.3"
+    "style-loader": "^3.3.3",
+    "tone": "^14.7.77"
   }
 }

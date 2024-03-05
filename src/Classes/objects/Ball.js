@@ -6,37 +6,18 @@ import Entity from "./Entity";
 import options from "../../data/options";
 
 class Ball extends Entity {
-  _moving = {
-    acc: new Vector(0, 0),
-    up: false,
-    down: false,
-    right: false,
-    left: false,
-  };
   _tail = [];
   _imageInstance;
 
-  constructor({
-    radius = 25,
-    tailLength = 0,
-    image,
-    controls = false,
-    ...otherArgs
-  }) {
+  constructor({ radius = 25, tailLength = 0, image, ...otherArgs }) {
     super(otherArgs);
 
     this.radius = radius;
     this.tailLength = tailLength;
     this.image = image;
-    this.controls = controls;
-
-    if (this.controls) {
-      this.controlMovement();
-    }
 
     if (this.image) {
       this.loadImage();
-      this.color = "transparent";
     }
 
     // InitialState
@@ -256,61 +237,6 @@ class Ball extends Entity {
             i * lineHeight
         )
       );
-    });
-  }
-
-  reposition() {
-    this.acc = this.appliedAcc.add(this._moving.acc);
-    this.vel = this.vel
-      .add(this.acc.divide(options.requestFrameCount))
-      .multiply(1 - this.friction);
-    this.pos = this.pos.add(this.vel.divide(options.requestFrameCount));
-  }
-
-  controlMovement() {
-    const events = ["keydown", "keyup"];
-
-    const magnitude = 0.6;
-    const direction = new Vector(0, 0);
-
-    events.forEach((event) => {
-      window.addEventListener(event, (e) => {
-        if (e.key === "w") {
-          this._moving.up = e.type === "keydown" ? true : false;
-        }
-        if (e.key === "s") {
-          this._moving.down = e.type === "keydown" ? true : false;
-        }
-        if (e.key === "d") {
-          this._moving.right = e.type === "keydown" ? true : false;
-        }
-        if (e.key === "a") {
-          this._moving.left = e.type === "keydown" ? true : false;
-        }
-
-        if (this._moving.up) {
-          direction.y = 1;
-        }
-        if (this._moving.down) {
-          direction.y = -1;
-        }
-        if (this._moving.right) {
-          direction.x = 1;
-        }
-        if (this._moving.left) {
-          direction.x = -1;
-        }
-
-        if (!this._moving.up && !this._moving.down) {
-          direction.y = 0;
-        }
-
-        if (!this._moving.right && !this._moving.left) {
-          direction.x = 0;
-        }
-
-        this._moving.acc = direction.unit().multiply(magnitude);
-      });
     });
   }
 }

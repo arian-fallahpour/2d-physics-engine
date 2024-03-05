@@ -12,7 +12,6 @@ const colorTypes = {
 const colorValues = ["color", "strokeColor", "textColor", "shadowColor"];
 
 class Entity {
-  acc = new Vector(0, 0);
   _modifiers = {
     passive: [],
     active: [],
@@ -29,10 +28,23 @@ class Entity {
     shadow: "",
   };
 
+  // Final acc value
+  acc = new Vector(0, 0);
+
+  // Controlled movement
+  _moving = {
+    acc: new Vector(0, 0),
+    up: false,
+    down: false,
+    right: false,
+    left: false,
+  };
+
   constructor({
     pos = new Vector(0, 0),
     vel = new Vector(0, 0),
     appliedAcc = new Vector(0, 0),
+    maxVel,
 
     color = "white",
     strokeColor = "transparent",
@@ -48,10 +60,12 @@ class Entity {
     name = `${this.constructor.name}-${Math.random()}-${Date.now()}`,
     displayVectors = false,
     displayInfo = [],
+    controls = false,
   }) {
     this.pos = pos;
     this.vel = vel;
     this.appliedAcc = appliedAcc;
+    this.maxVel = maxVel;
 
     this.color = color;
     this.strokeColor = strokeColor;
@@ -68,6 +82,11 @@ class Entity {
     this.name = name;
     this.displayVectors = displayVectors;
     this.displayInfo = displayInfo;
+    this.controls = controls;
+
+    if (this.controls) {
+      this.controlMovement();
+    }
   }
 
   setAppliedAcc(acc) {
@@ -102,6 +121,10 @@ class Entity {
     this.inverseMass = mass > 0 ? 1 / mass : 0;
   }
 
+  setInitial() {
+    this.initial = { ...this };
+  }
+
   getRainbow() {
     return `hsl(${(this._frame / options.requestFrameCount) % 360}, 100%, 50%)`;
   }
@@ -111,15 +134,67 @@ class Entity {
   }
 
   reposition() {
-    this.acc = this.appliedAcc;
+    this.acc = this.appliedAcc.add(this._moving.acc);
     this.vel = this.vel
       .add(this.acc.divide(options.requestFrameCount))
       .multiply(1 - this.friction);
+
+    // Limit velocity if maxVel exists
+    if (this.maxVel) {
+      this.vel = new Vector(
+        Math.max(Math.min(this.vel.x, this.maxVel.x), -this.maxVel.x),
+        Math.max(Math.min(this.vel.y, this.maxVel.y), -this.maxVel.y)
+      );
+    }
+
     this.pos = this.pos.add(this.vel.divide(options.requestFrameCount));
   }
 
-  setInitial() {
-    this.initial = { ...this };
+  controlMovement() {
+    const events = ["keydown", "keyup"];
+
+    const magnitude = 0.6;
+    const direction = new Vector(0, 0);
+
+    events.forEach((event) => {
+      window.addEventListener(event, (e) => {
+        if (e.key === "w") {
+          this._moving.up = e.type === "keydown" ? true : false;
+        }
+        if (e.key === "s") {
+          this._moving.down = e.type === "keydown" ? true : false;
+        }
+        if (e.key === "d") {
+          this._moving.right = e.type === "keydown" ? true : false;
+        }
+        if (e.key === "a") {
+          this._moving.left = e.type === "keydown" ? true : false;
+        }
+
+        if (this._moving.up) {
+          direction.y = 1;
+        }
+        if (this._moving.down) {
+          direction.y = -1;
+        }
+        if (this._moving.right) {
+          direction.x = 1;
+        }
+        if (this._moving.left) {
+          direction.x = -1;
+        }
+
+        if (!this._moving.up && !this._moving.down) {
+          direction.y = 0;
+        }
+
+        if (!this._moving.right && !this._moving.left) {
+          direction.x = 0;
+        }
+
+        this._moving.acc = direction.unit().multiply(magnitude);
+      });
+    });
   }
 
   addModifier(modifier) {

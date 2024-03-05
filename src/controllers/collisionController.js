@@ -163,6 +163,7 @@ export const resolveBallWallCollision = (ball, wall) => {
     newSeparatingVelocity - separatingVelocity;
 
   ball.vel = ball.vel.add(normal.multiply(separatingVelocityDifference));
+  // console.log(ball.vel);
 };
 
 export const resolveBallCircleCollision = (ball, circle) => {

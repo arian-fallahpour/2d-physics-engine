@@ -9,6 +9,7 @@ const playSoundTemplate = (instrument, noteName) => {
       Sound.sprite(notes, 500)
     );
   }
+
   return (data) => {
     model.state.sounds[instrument].play(noteName);
   };

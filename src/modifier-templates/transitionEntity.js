@@ -6,6 +6,7 @@ const defaultValue = {
 
 const transitionEntityTemplate = (entity, ...transitions) => {
   if (!transitions.length) transitions = defaultValue;
+
   return (data) => {
     transitions.forEach((t) => {
       entity.transition(t.property, t.value, t.duration * 60);

@@ -33,7 +33,7 @@ const initializer = (preset) => {
     radius: 10,
     color: "black",
     strokeColor: "rainbow",
-    appliedAcc: new Vector(0, -0.6),
+    // appliedAcc: new Vector(0, -0.6),
     tailLength: 25,
     vel: new Vector(0, 1)
       .unit()

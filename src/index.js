@@ -18,8 +18,8 @@ const main = () => {
   // Load presets
   model.loadPresets(
     platforms,
-    singleBall,
     multipleBalls,
+    singleBall,
     borderedBall,
     fractalOpen,
     circularBalls,

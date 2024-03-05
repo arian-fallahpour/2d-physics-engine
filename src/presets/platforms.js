@@ -5,63 +5,76 @@ import Ball from "../classes/objects/Ball";
 import Wall from "../classes/objects/Wall";
 
 import generatePlatformsTemplate from "../modifier-templates/generatePlatformsTemplate";
+import generatePlatformsTemplate2 from "../modifier-templates/generatePlatformsTemplate2";
 import transitionEntityTemplate from "../modifier-templates/transitionEntity";
-import playSoundTemplate from "../modifier-templates/playSound";
+import removeEntity from "../modifier-templates/removeEntity";
+import playToneTemplate from "../modifier-templates/playTone";
 
-import blindingLightsMidi from "../songs/blinding-lights/midi.json";
-import blindingLightsTrack1 from "../songs/blinding-lights/track-1.json";
-import blindingLightsTrack2 from "../songs/blinding-lights/track-2.json";
+import badPiggiesRythm from "../songs/rythms/badPiggies";
+
+import furEliseGen from "../songs/generations/furElise.json";
+import badPiggiesGen from "../songs/generations/badPiggies.json";
+import tadcGen from "../songs/generations/TADC.json";
+
+import tadcMIDI from "../songs/midis/TADC.json";
+import blindingLightsMIDI from "../songs/midis/blindingLights.json";
 
 const initializer = (preset) => {
   const isGenerating = false;
-  const track = 0;
-  const instrument = "piano";
-  const notesCount = 100;
-  const wallThickness = 10;
-
-  const ball = new Ball({
-    radius: 10,
-    pos: new Vector(
-      preset.canvas.element.clientWidth / 2 - 400,
-      preset.canvas.element.clientHeight / 2
-    ),
-    vel: new Vector(3, 0), // Increase if bouncing on left edge of above platforms
-    appliedAcc: new Vector(0, -0.2),
-    color: !isGenerating ? "rainbow" : "white",
-    strokeColor: "transparent",
-    shadowLength: 50,
-    tailLength: !isGenerating ? 30 : 0,
-  });
-
-  preset.addObjects("balls", ball);
-  preset.canvas.focusOn(ball);
+  const options = {
+    midi: tadcMIDI,
+    track: 0,
+    notesStart: 0,
+    notesCount: 100,
+    wallThickness: 7,
+    firstTime: 5,
+    maxBounceVel: 5,
+  };
 
   // If generating platforms, add modifiers
   if (isGenerating) {
-    const template = generatePlatformsTemplate;
-    const options = {
-      midi: blindingLightsMidi,
-      track,
-      instrument,
-      wallThickness,
-      notesCount,
-    };
+    // Create ball
+    const ball = new Ball({
+      radius: 10,
+      pos: new Vector(
+        preset.canvas.element.clientWidth / 2,
+        preset.canvas.element.clientHeight / 2
+      ),
+      vel: new Vector(4, 0), // Increase if bouncing on left edge of above platforms
+      appliedAcc: new Vector(0, -0.2),
+      maxVel: new Vector(10, 10),
+      color: "white",
+      strokeColor: "transparent",
+    });
+
+    preset.addObjects("balls", ball);
+    preset.canvas.focusOn(ball);
+
     const frameModifier = new Modifier({ type: "frame" }).use(
-      template,
+      generatePlatformsTemplate2,
       options
     );
     preset.addModifier(frameModifier);
   }
 
-  // If playing a generated file, add walls
+  // If playing a generated file
   else {
-    let wallsData;
+    const { ballInitial, wallsData } = tadcGen;
 
-    if (track === 0) {
-      wallsData = blindingLightsTrack1.wallsData;
-    } else if (track === 1) {
-      wallsData = blindingLightsTrack2.wallsData;
-    }
+    const ball = new Ball({
+      ...ballInitial,
+      color: "rainbow",
+      tailLength: 30,
+      appliedAcc: new Vector(
+        ballInitial.appliedAcc.x,
+        ballInitial.appliedAcc.y
+      ),
+      vel: new Vector(ballInitial.vel.x, ballInitial.vel.y),
+      pos: new Vector(ballInitial.pos.x, ballInitial.pos.y),
+      // image: "src/images/piggy.png",
+    });
+    preset.addObjects("balls", ball);
+    preset.canvas.focusOn(ball);
 
     wallsData.forEach((wallData, i) => {
       const wall = new Wall({
@@ -70,34 +83,29 @@ const initializer = (preset) => {
         elasticity: wallData.elasticity,
         thickness: wallData.thickness,
         color: "rgba(75, 75, 75, 1)",
-        shadowLength: 0,
       });
-
+      const transitions = [
+        {
+          property: "color",
+          value: `hsl(${(i % 40) * (360 / 40)}, 100%, 50%)`,
+          duration: 0.2,
+        },
+        {
+          property: "shadowColor",
+          value: `hsla(${(i % 40) * (360 / 40)}, 100%, 50%, .2)`,
+          duration: 0.2,
+        },
+        {
+          property: "shadowLength",
+          value: 200,
+          duration: 0.2,
+        },
+      ];
       wall.addModifier(
-        new Modifier().use(
-          transitionEntityTemplate,
-          wall,
-          {
-            property: "color",
-            value: `hsl(${(i % 10) * (360 / 10)}, 100%, 50%)`,
-            duration: 0.2,
-          },
-          {
-            property: "shadowColor",
-            value: `hsla(${(i % 10) * (360 / 10)}, 100%, 50%, .2)`,
-            duration: 0.2,
-          },
-          {
-            property: "shadowLength",
-            value: 300,
-            duration: 0.2,
-          }
-        )
+        new Modifier().use(transitionEntityTemplate, wall, ...transitions)
       );
-      wall.addModifier(
-        new Modifier().use(playSoundTemplate, instrument, wallData.noteName)
-      );
-
+      wall.addModifier(new Modifier().use(playToneTemplate, wallData.note));
+      wall.addModifier(new Modifier().use(removeEntity, preset, "walls", i, 4));
       preset.addObjects("walls", wall);
     });
   }

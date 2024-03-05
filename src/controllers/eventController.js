@@ -1,5 +1,6 @@
 import * as model from "../model";
-import { requestNextFrame } from "./frameController";
+import * as Tone from "tone";
+import midi from "../songs/midis/TADC.json";
 
 const eventHandler = () => {
   // EVENT HANDLERS
@@ -33,6 +34,23 @@ const eventHandler = () => {
     if (e.target.classList.contains("button-step")) {
       model.step();
     }
+  });
+
+  const musicButton = document.querySelector(".button-music");
+  musicButton.addEventListener("click", async (e) => {
+    await Tone.start();
+
+    const synth = new Tone.Synth().toDestination();
+    const treble = midi.tracks[0].notes.splice(0, 100);
+    treble.forEach((note, i) => {
+      const now = Tone.now();
+      synth.triggerAttackRelease(
+        note.name,
+        note.duration,
+        now + note.time + i / 100000,
+        note.velocity
+      );
+    });
   });
 };
 
