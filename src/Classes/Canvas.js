@@ -23,6 +23,13 @@ class Canvas {
     this.fillCanvas(backgroundColor);
   }
 
+  get center() {
+    return new Vector(
+      this.element.clientWidth / 2,
+      this.element.clientHeight / 2
+    );
+  }
+
   toCanvasY(y) {
     return this.element.clientHeight - y;
   }

@@ -1,39 +1,30 @@
 import Preset from "../classes/Preset";
-import canvas from "../classes/Canvas";
 
 import Ball from "../classes/objects/Ball";
 import Circle from "../classes/objects/Circle";
 import Vector from "../classes/Vector";
-import Text from "../classes/objects/Text";
 
 const initializer = (preset) => {
   const circleRadius = 200;
-  const ballsCount = 1000;
-  const velDirection = new Vector(0, 1).rotate(Math.PI * 2 * Math.random());
-  const velMagnitude = 4;
+  const ballsCount = 3000;
+  const velDirection = new Vector(0, 1);
+  const velMagnitude = 5;
   const totalAngle = Math.PI;
 
-  // const text = new Text({
-  //   content: `Angle difference: π / 10000`,
-  //   pos: new Vector(
-  //     preset.canvas.element.clientWidth / 2,
-  //     preset.canvas.element.clientHeight / 2 + 250
-  //   ),
-  // });
-  // preset.addObjects("texts", text);
-
-  // Create circles
+  // 1. Create circle
   const circle = new Circle({
     pos: new Vector(
       preset.canvas.element.clientWidth / 2,
       preset.canvas.element.clientHeight / 2
     ),
     radius: circleRadius,
+    strokeColor: "white",
+    thickness: 2,
     mass: 0,
   });
   preset.addObjects("circles", circle);
 
-  // Create Balls
+  // 2. Create Balls
   const balls = [];
   for (let i = 0; i < ballsCount; i++) {
     const ball = new Ball({
@@ -43,8 +34,8 @@ const initializer = (preset) => {
       ),
       appliedAcc: new Vector(0, -0.05),
       color: `hsl(${((i / ballsCount) * 180 + 250) % 360}, 70%, 50%)`,
-      radius: 0.75,
-      borderColor: "transparent",
+      radius: 1,
+      strokeColor: "transparent",
     });
     ball.setVel(
       velDirection

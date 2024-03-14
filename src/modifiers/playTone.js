@@ -2,7 +2,7 @@ import * as Tone from "tone";
 
 import * as model from "../model";
 
-const playToneTemplate = (note, instrument = "Synth") => {
+const playTone = (note, instrument = "Synth") => {
   if (!model.state.tones.synth) {
     model.state.tones.synth = new Tone[instrument]().toDestination();
   }
@@ -18,4 +18,4 @@ const playToneTemplate = (note, instrument = "Synth") => {
   };
 };
 
-export default playToneTemplate;
+export default playTone;

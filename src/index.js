@@ -12,20 +12,28 @@ import chaosTheory from "./presets/chaosTheory";
 import circularBalls from "./presets/circularBalls";
 import bouncingCircles from "./presets/bouncingCircles";
 import fractalOpen from "./presets/fractalOpen";
-import platforms from "./presets/platforms";
+import platformRythms from "./presets/platformRythms";
+import breakout from "./presets/breakout";
+import digitsOfPI from "./presets/digitsOfPI";
+import testing from "./presets/testing";
+import circlesInCircles from "./presets/circlesInCircles";
 
 const main = () => {
   // Load presets
   model.loadPresets(
-    platforms,
-    multipleBalls,
-    singleBall,
-    borderedBall,
-    fractalOpen,
-    circularBalls,
-    plinko,
+    circlesInCircles,
+    bouncingCircles,
+    platformRythms,
+    testing,
+    breakout,
+    digitsOfPI,
     chaosTheory,
-    bouncingCircles
+    circularBalls,
+    fractalOpen,
+    singleBall,
+    plinko,
+    borderedBall,
+    multipleBalls
   );
 
   // Load current preset

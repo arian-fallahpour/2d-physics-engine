@@ -6,18 +6,9 @@ import Ball from "../classes/objects/Ball";
 import Circle from "../classes/objects/Circle";
 import Text from "../classes/objects/Text";
 import Wall from "../classes/objects/Wall";
-import {
-  changeFractalAngleBallModifier,
-  changeFractalLayerBallModifier,
-  melodyModifier,
-  revertBallModifier,
-  revertFractalModifier,
-  rotatingGravityBallModifier,
-} from "../controllers/modifierController";
 
 const initializer = (preset) => {
   const circleRadius = 150;
-  //   const reverter = () => fractal.layers === 0;
   const reverter = () => fractal.angle >= Math.PI / 2 || fractal.angle <= 0;
   const centerPosition = new Vector(
     preset.canvas.element.clientWidth / 2,
@@ -28,7 +19,7 @@ const initializer = (preset) => {
   const circle = new Circle({
     pos: centerPosition,
     radius: circleRadius,
-    borderColor: "white",
+    strokeColor: "white",
   });
   preset.addObjects("circles", circle);
 
@@ -39,7 +30,6 @@ const initializer = (preset) => {
     baseLength: 50,
     pos: centerPosition.add(new Vector(0, circleRadius)),
   });
-  // fractal.addModifier(revertFractalModifier(fractal, reverter));
   preset.addObjects("fractals", fractal);
 
   // Create walls
@@ -80,18 +70,13 @@ const initializer = (preset) => {
     rainbow: true,
     radius: 10,
     color: "rainbow",
-    borderColor: "white",
+    strokeColor: "white",
     appliedAcc: new Vector(0, 0.4),
     vel: new Vector(0, 1)
       .unit()
       .multiply(12)
       .rotate(Math.random() * (Math.PI / 6)),
   });
-  // ball.addModifier(changeFractalLayerBallModifier(ball, circle, fractal));
-  // ball.addModifier(changeFractalAngleBallModifier(ball, circle, fractal));
-  // ball.addModifier(rotatingGravityBallModifier(ball, circle));
-  // ball.addModifier(revertBallModifier(ball, reverter));
-  // ball.addModifier(melodyModifier("megalovania", "drop-synth"));
   preset.addObjects("balls", ball);
 };
 

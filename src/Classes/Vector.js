@@ -42,14 +42,15 @@ class Vector {
     return this.x * vector.x + this.y * vector.y;
   }
 
-  draw(x, y, color = "white", factor = 1) {
+  draw(pos = new Vector(0, 0), color = "white", factor = 1) {
     const { canvas } = state.preset;
 
     canvas.ctx.beginPath();
-    canvas.ctx.moveTo(x, canvas.toCanvasY(y));
+    canvas.ctx.lineWidth = 1;
+    canvas.ctx.moveTo(pos.x, canvas.toCanvasY(pos.y));
     canvas.ctx.lineTo(
-      x + this.x * factor,
-      canvas.toCanvasY(y + this.y * factor)
+      pos.x + this.x * factor,
+      canvas.toCanvasY(pos.y + this.y * factor)
     );
     canvas.ctx.strokeStyle = color;
     canvas.ctx.stroke();

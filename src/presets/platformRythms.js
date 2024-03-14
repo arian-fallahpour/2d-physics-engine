@@ -4,54 +4,57 @@ import Vector from "../classes/Vector";
 import Ball from "../classes/objects/Ball";
 import Wall from "../classes/objects/Wall";
 
-import generatePlatformsTemplate from "../modifier-templates/generatePlatformsTemplate";
-import generatePlatformsTemplate2 from "../modifier-templates/generatePlatformsTemplate2";
-import transitionEntityTemplate from "../modifier-templates/transitionEntity";
-import removeEntity from "../modifier-templates/removeEntity";
-import playToneTemplate from "../modifier-templates/playTone";
-
-import badPiggiesRythm from "../songs/rythms/badPiggies";
+import generateRythm from "../modifiers/generateRythm";
+import generateRythm2 from "../modifiers/generateRythm2";
+import transitionEntityTemplate from "../modifiers/transitionEntity";
+import removeEntity from "../modifiers/removeEntity";
+import playToneTemplate from "../modifiers/playTone";
 
 import furEliseGen from "../songs/generations/furElise.json";
 import badPiggiesGen from "../songs/generations/badPiggies.json";
 import tadcGen from "../songs/generations/TADC.json";
+import tetrisGen from "../songs/generations/tetris.json";
+import keroseneGen from "../songs/generations/kerosene.json";
+import megalovaniaGen from "../songs/generations/megalovania.json";
+import arabianNightsGen from "../songs/generations/arabianNights.json";
 
 import tadcMIDI from "../songs/midis/TADC.json";
+import megalovaniaMIDI from "../songs/midis/megalovania.json";
+import keroseneMIDI from "../songs/midis/kerosene.json";
+import arabianNightsMIDI from "../songs/midis/arabianNights.json";
+import tetrisMIDI from "../songs/midis/tetris.json";
 import blindingLightsMIDI from "../songs/midis/blindingLights.json";
 
 const initializer = (preset) => {
+  const generated = arabianNightsGen;
   const isGenerating = false;
   const options = {
-    midi: tadcMIDI,
+    midi: arabianNightsMIDI,
     track: 0,
     notesStart: 0,
     notesCount: 100,
     wallThickness: 7,
-    firstTime: 5,
-    maxBounceVel: 5,
+    firstTime: 1,
+    maxBounceVel: 7,
   };
 
   // If generating platforms, add modifiers
   if (isGenerating) {
-    // Create ball
     const ball = new Ball({
-      radius: 10,
+      radius: 15,
       pos: new Vector(
         preset.canvas.element.clientWidth / 2,
         preset.canvas.element.clientHeight / 2
       ),
-      vel: new Vector(4, 0), // Increase if bouncing on left edge of above platforms
-      appliedAcc: new Vector(0, -0.2),
-      maxVel: new Vector(10, 10),
+      vel: new Vector(4, 0),
+      appliedAcc: new Vector(0, -0.5),
       color: "white",
       strokeColor: "transparent",
     });
-
     preset.addObjects("balls", ball);
     preset.canvas.focusOn(ball);
-
     const frameModifier = new Modifier({ type: "frame" }).use(
-      generatePlatformsTemplate2,
+      generateRythm2,
       options
     );
     preset.addModifier(frameModifier);
@@ -59,7 +62,7 @@ const initializer = (preset) => {
 
   // If playing a generated file
   else {
-    const { ballInitial, wallsData } = tadcGen;
+    const { ballInitial, wallsData } = generated;
 
     const ball = new Ball({
       ...ballInitial,
@@ -83,6 +86,7 @@ const initializer = (preset) => {
         elasticity: wallData.elasticity,
         thickness: wallData.thickness,
         color: "rgba(75, 75, 75, 1)",
+        edges: "round",
       });
       const transitions = [
         {
@@ -111,9 +115,9 @@ const initializer = (preset) => {
   }
 };
 
-const platforms = new Preset({
-  name: "platforms",
+const platformRythms = new Preset({
+  name: "platform rythms",
   initializer,
 });
 
-export default platforms;
+export default platformRythms;

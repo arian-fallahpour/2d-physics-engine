@@ -3,7 +3,6 @@ import Vector from "../classes/Vector";
 import Wall from "../classes/objects/Wall";
 import engine from "../data/engine";
 import options from "../data/options";
-import playSoundTemplate from "./playSound";
 
 import * as model from "../model";
 import playToneTemplate from "./playTone";
@@ -13,16 +12,14 @@ const cps = 60 * options.requestFrameCount; // Steps per second
 /**
  * NOTES
  * - This algorithm is much more efficient at generating
- * - It produces more visually pleasing bounces and platform placements
+ * - It produces more visually pleasing bounces and platform placements with the power of being more customizable
  *
  * PROBLEMS:
  * - Fix ball hitting edge of wall after a long note
- *
- * TODO:
- * - Maybe add faulty platforms, but may not even be needed
+ *  - Seems fixed
  */
 
-const generatePlatforms2Template = ({
+const generateRythm2 = ({
   midi,
   track = 0,
   notesStart = 0,
@@ -33,6 +30,7 @@ const generatePlatforms2Template = ({
 }) => {
   // Remove duplicate notes and limit number of notes
   const notes = getNotes();
+  console.log(notes);
 
   // Wall/ball data
   const positions = [];
@@ -90,7 +88,7 @@ const generatePlatforms2Template = ({
         retries += 1;
         faultyNote = note;
         note = Math.max(note - 1, 0); // Go back a note
-        checkpoint = engine.frame - getTotalDuration() * cps;
+        checkpoint = engine.frame - getTotalDuration(note) * cps;
 
         positions.splice(note, 1);
         velocities.splice(note, 1);
@@ -137,6 +135,15 @@ const generatePlatforms2Template = ({
           data.placed = "above";
           data.y = ball.pos.y + shift;
           data.start = note === 0 ? ball.initial.pos.x : positions[note - 1].x;
+
+          // Push start of platform if timeDiff was too long 2 notes ago
+          const prevTimeDiff = getPrev2TimeDiff();
+          if (prevTimeDiff && prevTimeDiff > 0.25) {
+            const m = 1;
+            const factor = Math.min(prevTimeDiff, m) / m;
+            const pushStart = factor * ball.radius;
+            data.start += pushStart;
+          }
         }
 
         // If ball is falling, place platform below
@@ -176,13 +183,33 @@ const generatePlatforms2Template = ({
   };
 
   function getNotes() {
-    return midi.tracks[track].notes
-      .filter((note, i, arr) => i === 0 || note.time !== arr[i - 1].time)
-      .map((note, i, arr) => ({
-        ...note,
-        time: note.time - arr[notesStart].time,
-      }))
-      .slice(notesStart, notesStart + notesCount);
+    return (
+      midi.tracks[track].notes
+
+        // If note occurs at same time, or has an extremely small time difference
+        .filter(
+          (note, i, arr) =>
+            i === 0 ||
+            (note.time !== arr[i - 1].time && note.time - arr[i - 1].time > 0.1)
+        )
+        .map((note, i, arr) => ({
+          ...note,
+          time: note.time - arr[notesStart].time,
+        }))
+        .slice(notesStart, notesStart + notesCount)
+    );
+  }
+
+  function getPrev2TimeDiff() {
+    if (note === 0) {
+      return null;
+    } else if (note === 1) {
+      return firstTime;
+    } else if (note === 2) {
+      return notes[note - 1].time;
+    } else if (note > 2) {
+      return notes[note - 1].time - notes[note - 2].time;
+    }
   }
 
   function isTooClose(ball, isFalling) {
@@ -194,6 +221,7 @@ const generatePlatforms2Template = ({
         (prevWall.placed === "above" && isFalling) ||
         (prevWall.placed === "below" && !isFalling);
       const tooClose = Math.abs(ball.pos.y - prevWall.y) < minWallSep;
+      // console.log(Math.abs(ball.pos.y - prevWall.y), minWallSep);
 
       return diffPlaced && tooClose;
     }
@@ -201,8 +229,12 @@ const generatePlatforms2Template = ({
     return false;
   }
 
-  function getTotalDuration() {
-    return firstTime + notes[note - 1].time;
+  function getTotalDuration(note) {
+    if (note === 0) {
+      return firstTime;
+    } else if (note > 0) {
+      return firstTime + notes[note - 1].time;
+    }
   }
 
   function addWall(preset, data) {
@@ -220,4 +252,4 @@ const generatePlatforms2Template = ({
   }
 };
 
-export default generatePlatforms2Template;
+export default generateRythm2;

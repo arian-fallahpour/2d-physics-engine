@@ -21,7 +21,7 @@ import playSoundTemplate from "./playSound";
  * - Have a minimum bounce velocity so it does not just "roll" off the platform
  */
 
-const generatePlatformsTemplate = ({
+const generateRythm = ({
   melody,
   notesStart = 0,
   notesEnd = 20,
@@ -333,4 +333,4 @@ const generatePlatformsTemplate = ({
   }
 };
 
-export default generatePlatformsTemplate;
+export default generateRythm;

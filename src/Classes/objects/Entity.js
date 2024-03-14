@@ -44,6 +44,7 @@ class Entity {
     pos = new Vector(0, 0),
     vel = new Vector(0, 0),
     appliedAcc = new Vector(0, 0),
+    forces = [],
     maxVel,
 
     color = "white",
@@ -66,6 +67,7 @@ class Entity {
     this.vel = vel;
     this.appliedAcc = appliedAcc;
     this.maxVel = maxVel;
+    this.forces = forces;
 
     this.color = color;
     this.strokeColor = strokeColor;
@@ -74,7 +76,6 @@ class Entity {
     this.shadowLength = shadowLength;
 
     this.mass = mass;
-    this.inverseMass = mass > 0 ? 1 / mass : 0;
     this.friction = friction;
     this.elasticity = elasticity;
     this.thickness = thickness;
@@ -87,6 +88,10 @@ class Entity {
     if (this.controls) {
       this.controlMovement();
     }
+  }
+
+  get inverseMass() {
+    return this.mass > 0 ? 1 / this.mass : 0;
   }
 
   setAppliedAcc(acc) {
@@ -201,6 +206,13 @@ class Entity {
     this._modifiers[modifier.type].push(modifier);
   }
 
+  clearModifiers(type) {
+    this._modifiers = {
+      active: [],
+      passive: [],
+    };
+  }
+
   modify(type, data) {
     this._modifiers[type].forEach((modifier) => modifier.apply(data));
   }
@@ -290,7 +302,12 @@ class Entity {
 
       // Apply transition
       if (isColor) {
-        const ci = color(initial);
+        let ci;
+        if (initial === "rainbow") {
+          ci = color(this.getRainbow());
+        } else {
+          ci = color(initial);
+        }
         const cf = color(final);
 
         const rgba = {};

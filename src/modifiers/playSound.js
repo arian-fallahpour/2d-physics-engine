@@ -2,17 +2,18 @@ import Sound from "../classes/Sound";
 import notes from "../data/notes";
 import * as model from "../model";
 
-const playSoundTemplate = (instrument, noteName) => {
+const playSound = (instrument, noteName) => {
   if (!model.state.sounds[instrument]) {
     model.state.sounds[instrument] = new Sound(
       instrument,
-      Sound.sprite(notes, 500)
+      noteName ? Sound.sprite(notes, 500) : undefined
     );
   }
 
   return (data) => {
+    console.log(model.state.sounds);
     model.state.sounds[instrument].play(noteName);
   };
 };
 
-export default playSoundTemplate;
+export default playSound;

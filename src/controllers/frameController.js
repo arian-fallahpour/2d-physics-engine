@@ -16,6 +16,9 @@ import {
   isCircleCirclePenetrating,
   resolveCircleCirclePenetration,
   resolveCircleCircleCollision,
+  isCircleWallPenetrating,
+  resolveCircleWallPenetration,
+  resolveCircleWallCollision,
 } from "./collisionController";
 
 const frameHandler = (timeMs) => {
@@ -45,14 +48,24 @@ const frameHandler = (timeMs) => {
   Entity.render(texts);
 
   Entity.render(circles, (circle1, i) => {
+    // Check if penetrating other circles
     circles.forEach((circle2, j) => {
       if (i === j) return; // If same circle
       if (i < j) return; // If resolution has already been calculated
+      if (circle1.mass === 0 && circle2.mass === 0) {
+        console.warn("Warning: Both entities have zero mass");
+      }
 
       const isPenetrating = isCircleCirclePenetrating(circle1, circle2);
       if (!isPenetrating) return;
 
-      const data = { circle1, circle2, circle1Index: i, circle2Index: j };
+      const data = {
+        preset,
+        circle1,
+        circle2,
+        circle1Index: i,
+        circle2Index: j,
+      };
 
       circle1.modify("active", data);
       circle2.modify("active", data);
@@ -60,32 +73,65 @@ const frameHandler = (timeMs) => {
       resolveCircleCirclePenetration(circle1, circle2);
       resolveCircleCircleCollision(circle1, circle2);
     });
+
+    // Check if penetrating any walls
+    walls.forEach((wall, j) => {
+      const isPenetrating = isCircleWallPenetrating(circle1, wall);
+      if (!isPenetrating) return;
+
+      const data = {
+        preset,
+        circle: circle1,
+        wall,
+        circle1Index: i,
+        wallIndex: j,
+      };
+
+      circle1.modify("active", data);
+      wall.modify("active", data);
+
+      resolveCircleWallPenetration(circle1, wall);
+      resolveCircleWallCollision(circle1, wall);
+    });
   });
 
   Entity.render(balls, (ball1, i) => {
     // Check if penetrating any other balls
-    // balls.forEach((ball2, j) => {
-    //   if (i === j) return; // If same ball
-    //   if (i < j) return; // If resolution has already been calculated
+    balls.forEach((ball2, j) => {
+      if (i === j) return; // If same ball
+      if (i < j) return; // If resolution has already been calculated
+      if (ball1.mass === 0 && ball2.mass === 0) {
+        console.warn("Warning: Both entities have zero mass");
+      }
 
-    //   const isPenetrating = isBallBallPenetrating(ball1, ball2);
-    //   if (!isPenetrating) return;
+      const isPenetrating = isBallBallPenetrating(ball1, ball2);
+      if (!isPenetrating) return;
 
-    //   const data = { ball1, ball2, ball1Index: i, ball2Index: j };
+      const data = { preset, ball1, ball2, ball1Index: i, ball2Index: j };
 
-    //   ball1.modify("active", data);
-    //   ball2.modify("active", data);
+      ball1.modify("active", data);
+      ball2.modify("active", data);
 
-    //   resolveBallBallPenetration(ball1, ball2);
-    //   resolveBallBallCollision(ball1, ball2);
-    // });
+      resolveBallBallPenetration(ball1, ball2);
+      resolveBallBallCollision(ball1, ball2);
+    });
 
     // Check if penetrating any circles
     circles.forEach((circle, j) => {
+      if (ball1.mass === 0 && circle.mass === 0) {
+        console.warn("Warning: Both entities have zero mass");
+      }
+
       const isPenetrating = isBallCirclePenetrating(ball1, circle);
       if (!isPenetrating) return;
 
-      const data = { circle, ball: ball1, ballIndex: i, circleIndex: j };
+      const data = {
+        preset,
+        circle,
+        ball: ball1,
+        ballIndex: i,
+        circleIndex: j,
+      };
 
       ball1.modify("active", data);
       circle.modify("active", data);
@@ -99,7 +145,7 @@ const frameHandler = (timeMs) => {
       const isPenetrating = isBallWallPenetrating(ball1, wall);
       if (!isPenetrating) return;
 
-      const data = { ball: ball1, wall, ballIndex: i, wallIndex: j };
+      const data = { preset, ball: ball1, wall, ballIndex: i, wallIndex: j };
 
       ball1.modify("active", data);
       wall.modify("active", data);

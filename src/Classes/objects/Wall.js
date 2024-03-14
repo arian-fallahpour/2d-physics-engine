@@ -9,8 +9,10 @@ class Wall extends Entity {
     end = new Vector(0, 0),
     elasticity = 1,
     edges = "butt",
+    strokeColor = "white",
     ...otherArgs
   }) {
+    otherArgs.strokeColor = strokeColor;
     super(otherArgs);
 
     this.start = start;
@@ -19,6 +21,10 @@ class Wall extends Entity {
     this.edges = edges;
 
     this.setInitial();
+  }
+
+  get center() {
+    return this.start.add(this.end.subtract(this.start).divide(2));
   }
 
   draw() {

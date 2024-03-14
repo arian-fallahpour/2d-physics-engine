@@ -44,6 +44,7 @@ class Ball extends Entity {
       strokeColor: this.getColor("stroke"),
       shadowColor: this.getColor("shadow"),
       shadowLength: this.shadowLength,
+      thickness: this.thickness,
     });
 
     // Draw image if exists
@@ -86,9 +87,24 @@ class Ball extends Entity {
     }
 
     // Render tail
-    this._tail.forEach((segment) => {
-      this.drawCircle(segment);
-    });
+    for (let i = 0; i < this._tail.length; i++) {
+      this.drawCircle(this._tail[i]);
+
+      // const { canvas } = state.preset;
+
+      // canvas.ctx.beginPath();
+      // canvas.ctx.lineWidth = 1;
+      // canvas.ctx.lineCap = "round";
+
+      // for (let i = 0; i < this._tail.length; i++) {
+      //   canvas.ctx.lineTo(
+      //     this._tail[i].pos.x,
+      //     canvas.toCanvasY(this._tail[i].pos.y)
+      //   );
+      // }
+      // canvas.ctx.strokeStyle = this.getColor("fill");
+      // canvas.ctx.stroke();
+    }
   }
 
   drawShadow() {
@@ -134,7 +150,7 @@ class Ball extends Entity {
     canvas.ctx.fill();
 
     canvas.ctx.strokeStyle = strokeColor;
-    canvas.ctx.strokeWidth = thickness;
+    canvas.ctx.lineWidth = thickness;
     canvas.ctx.stroke();
 
     canvas.ctx.closePath();
@@ -229,12 +245,9 @@ class Ball extends Entity {
       canvas.ctx.textAlign = "center";
       canvas.ctx.fillText(
         text,
-        this.pos.x - this.vel.x,
+        this.pos.x,
         canvas.toCanvasY(
-          this.pos.y -
-            this.vel.y +
-            ((props.length - 1) * lineHeight) / 2 -
-            i * lineHeight
+          this.pos.y + ((props.length - 1) * lineHeight) / 2 - i * lineHeight
         )
       );
     });

@@ -28,6 +28,7 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.28",
     "color-convert": "^2.0.1",
     "howler": "^2.2.4",
     "onecolor": "^4.1.0",

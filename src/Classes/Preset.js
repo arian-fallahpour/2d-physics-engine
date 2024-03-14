@@ -11,10 +11,12 @@ class Preset {
     name = `preset-${Math.random()}-${Date.now()}`,
     initializer = function () {},
     canvas = {},
+    options = { displayFPS: false },
   }) {
     this.name = name;
     this.canvas = new Canvas(canvas);
     this.initializer = initializer;
+    this.options = options;
 
     this.objects = {
       balls: [],

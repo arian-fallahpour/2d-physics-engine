@@ -1,15 +1,16 @@
+import Modifier from "../classes/Modifier";
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Ball from "../classes/objects/Ball";
 import Circle from "../classes/objects/Circle";
-import {
-  melodyModifier,
-  bouncingCircleModifier,
-  soundModifier,
-} from "../controllers/modifierController";
+
+import playMelody from "../modifiers/playMelody";
+import increaseRadius from "../modifiers/changeProp";
+import nextCircle from "../modifiers/nextCircle";
+
+import midi from "../songs/midis/kerosene.json";
 
 const initializer = (preset) => {
-  const circleRadius = 200;
+  const circleThickness = 15;
 
   // Create center circle
   const circle1 = new Circle({
@@ -18,9 +19,9 @@ const initializer = (preset) => {
       preset.canvas.element.clientWidth / 2,
       preset.canvas.element.clientHeight / 2
     ),
-    radius: 15,
-    color: "white",
-    borderColor: "transparent",
+    radius: circleThickness * 2,
+    color: "blue",
+    strokeColor: "transparent",
     mass: 0,
   });
 
@@ -32,15 +33,23 @@ const initializer = (preset) => {
       preset.canvas.element.clientHeight / 2
     ),
     mass: 1,
-    radius: circleRadius,
-    borderColor: "rainbow",
+    radius: 230,
+    strokeColor: "rgba(0, 0, 255, .3)",
     appliedAcc: new Vector(0, -0.5),
-    thickness: 8,
+    thickness: circleThickness,
     vel: new Vector(4, 4),
   });
-  // circle2.addModifier(bouncingCircleModifier(circle2));
-  // circle2.addModifier(soundModifier("fluid-bass", true));
-  preset.addObjects("circles", circle1, circle2);
+  const playMelodyModifier = new Modifier().use(playMelody, midi, 4);
+  const increaseRadiusModifier = new Modifier().use(
+    increaseRadius,
+    circle2,
+    () => -(circleThickness * (4 / 3))
+  );
+  const nextCircleModifier = new Modifier({ type: "frame" }).use(nextCircle);
+  circle2.addModifier(playMelodyModifier);
+  circle2.addModifier(increaseRadiusModifier);
+  preset.addObjects("circles", circle2, circle1);
+  preset.addModifier(nextCircleModifier, circle2);
 };
 
 const bouncingCircles = new Preset({

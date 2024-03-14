@@ -1,4 +1,4 @@
-const loggerTemplate = (ball) => {
+const logger = (ball) => {
   // Initial data
 
   return (data) => {
@@ -6,4 +6,4 @@ const loggerTemplate = (ball) => {
   };
 };
 
-export default loggerTemplate;
+export default logger;
