@@ -8,14 +8,12 @@ import options from "./data/options";
 export const state = {
   play: false,
   step: false,
-  collisions: 0,
   presets: [],
   presetIndex: 0,
   preset: null,
   sounds: {},
   melodies: {},
   tones: {},
-  reverting: false,
 };
 
 export const play = () => {

@@ -6,6 +6,7 @@ class Preset {
     before: [],
     after: [],
   };
+  steps = 4;
 
   constructor({
     name = `preset-${Math.random()}-${Date.now()}`,
@@ -17,7 +18,6 @@ class Preset {
     this.canvas = new Canvas(canvas);
     this.initializer = initializer;
     this.options = options;
-
     this.objects = {
       balls: [],
       circles: [],
