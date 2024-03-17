@@ -1,7 +1,7 @@
 import convert from "color-convert";
 import engine from "../data/engine";
-import options from "../data/options";
 import Vector from "./Vector";
+import { state } from "../model";
 
 const dpr = window.devicePixelRatio;
 
@@ -73,7 +73,7 @@ class Canvas {
     const modes = {
       normal: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 1)`,
       lucid: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${
-        engine.frame % options.requestFrameCount === 0 ? 0.1 : 0
+        engine.frame % state.preset.options.stepsPerFrame === 0 ? 0.1 : 0
       })`,
       trail: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0)`,
     };

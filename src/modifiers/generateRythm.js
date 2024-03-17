@@ -1,10 +1,8 @@
 import Modifier from "../classes/Modifier";
-import Sound from "../classes/Sound";
 import Vector from "../classes/Vector";
 import Wall from "../classes/objects/Wall";
 
 import engine from "../data/engine";
-import options from "../data/options";
 
 import * as model from "../model";
 import playSoundTemplate from "./playSound";
@@ -69,7 +67,7 @@ const generateRythm = ({
     const { balls, walls } = preset.objects;
     const ball = balls[0];
 
-    const cps = 60 * options.requestFrameCount; // Calculations per second
+    const cps = 60 * model.state.preset.options.stepsPerFrame; // Calculations per second
     const timePassed = (engine.frame - checkpoint) / cps; // Time passed of actual rythmn
     const timeOfNote = getNoteTime(note);
     const prevPlaced = wallsData[note - 1]?.placed;

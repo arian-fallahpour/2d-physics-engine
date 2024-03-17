@@ -24,9 +24,8 @@ const initializer = (preset) => {
   const circle = new Circle({
     pos: preset.canvas.center,
     radius: 200,
-    strokeColor: "white",
+    strokeColor: "rainbow",
     thickness: 5,
-    elasticity: 0,
   });
   // const decreasingCircleRadiusModifier = new Modifier({ type: "passive" });
   // const increaseCircleRadiusModifier = new Modifier();
@@ -44,14 +43,19 @@ const initializer = (preset) => {
   // circle.addModifier(increaseCircleRadiusModifier);
 
   // 2. Create balls
-  const ball = new Ball({
-    pos: preset.canvas.center,
+  const ball1 = new Ball({
+    pos: preset.canvas.center.add(new Vector(50, 0)),
     radius: 15,
-    // accs: { gravity: new Vector(0, -0.4) },
+    accs: { gravity: new Vector(0, -0.4) },
     color: "rainbow",
-    controls: true,
-
-    // vel: new Vector(0, 8).rotate(Math.PI * 2 * Math.random()),
+    vel: new Vector(0, 8).rotate(Math.PI * 2 * Math.random()),
+  });
+  const ball2 = new Ball({
+    pos: preset.canvas.center.add(new Vector(-50, 0)),
+    radius: 15,
+    accs: { gravity: new Vector(0, -0.4) },
+    color: "rainbow",
+    vel: new Vector(0, 8).rotate(Math.PI * 2 * Math.random()),
   });
   // const increaseBallRadiusModifier = new Modifier();
   // const increaseBallVelModifier = new Modifier();
@@ -96,7 +100,7 @@ const initializer = (preset) => {
   // preset.addModifier(revertPresetModifier);
 
   preset.addObjects("circles", circle);
-  preset.addObjects("balls", ball);
+  preset.addObjects("balls", ball1, ball2);
   // preset.canvas.focusOn(ball);
 };
 

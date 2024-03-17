@@ -40,6 +40,9 @@ const initializer = (preset) => {
 const pendulums = new Preset({
   name: "pendulums",
   initializer,
+  options: {
+    stepsPerFrame: 100,
+  },
 });
 
 export default pendulums;

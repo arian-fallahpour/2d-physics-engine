@@ -1,7 +1,8 @@
-import options from "../../data/options";
 import { transition } from "../../helper";
 import Vector from "../Vector";
 import color from "onecolor";
+
+import { state } from "../../model";
 
 const colorTypes = {
   fill: "color",
@@ -97,7 +98,9 @@ class Entity {
   }
 
   getRainbow() {
-    return `hsl(${(this._frame / options.requestFrameCount) % 360}, 100%, 50%)`;
+    return `hsl(${
+      (this._frame / state.preset.options.stepsPerFrame) % 360
+    }, 100%, 50%)`;
   }
 
   getColor(colorType) {
@@ -145,7 +148,7 @@ class Entity {
   reposition() {
     const acc = this.getTotalAcc();
     this.vel = this.vel
-      .add(acc.divide(options.requestFrameCount))
+      .add(acc.divide(state.preset.options.stepsPerFrame))
       .multiply(1 - this.friction);
 
     // Limit velocity if maxVel exists
@@ -156,7 +159,9 @@ class Entity {
       );
     }
 
-    this.pos = this.pos.add(this.vel.divide(options.requestFrameCount));
+    this.pos = this.pos.add(
+      this.vel.divide(state.preset.options.stepsPerFrame)
+    );
   }
 
   keyControls() {
@@ -202,7 +207,7 @@ class Entity {
         this.accs.movement = direction
           .unit()
           .multiply(this.movingMagnitude)
-          .divide(options.requestFrameCount);
+          .divide(state.preset.options.stepsPerFrame);
       });
     });
   }
@@ -255,7 +260,7 @@ class Entity {
 
     const data = {
       start: this._frame,
-      duration: frames * options.requestFrameCount,
+      duration: frames * state.preset.options.stepsPerFrame,
       property,
       initial: this[property],
       final: value,
@@ -294,7 +299,7 @@ class Entity {
           this.transition(
             data.property,
             initial,
-            data.duration / options.requestFrameCount,
+            data.duration / state.preset.options.stepsPerFrame,
             false,
             true
           );

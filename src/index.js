@@ -22,11 +22,11 @@ import pendulums from "./presets/pendulums";
 const main = () => {
   // Load presets
   model.loadPresets(
-    breakout,
+    singleBall,
     pendulums,
+    breakout,
     chaosTheory,
     testing,
-    singleBall,
     platformRythms,
     circlesInCircles,
     bouncingCircles,
@@ -38,8 +38,10 @@ const main = () => {
     multipleBalls
   );
 
+  console.log(model.state.presets);
+
   // Load current preset
-  model.loadPreset();
+  model.initPreset();
 
   // Handle events
   eventHandler();

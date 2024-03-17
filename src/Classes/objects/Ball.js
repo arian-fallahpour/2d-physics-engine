@@ -1,4 +1,3 @@
-import options from "../../data/options";
 import { state } from "../../model";
 
 import Vector from "../Vector";
@@ -45,7 +44,7 @@ class Ball extends Entity {
     };
 
     // Throttle to 60 times a second
-    if ((this._frame + 35) % options.requestFrameCount === 0) {
+    if ((this._frame + 35) % state.preset.options.stepsPerFrame === 0) {
       // Add newest segment
       this._tail.push(data);
 
@@ -137,9 +136,11 @@ class Ball extends Entity {
     canvas.ctx.save();
 
     const x =
-      this.pos.x + (onLoad ? -this.vel.x / options.requestFrameCount : 0);
+      this.pos.x +
+      (onLoad ? -this.vel.x / state.preset.options.stepsPerFrame : 0);
     const y =
-      this.pos.y + (onLoad ? -this.vel.y / options.requestFrameCount : 0);
+      this.pos.y +
+      (onLoad ? -this.vel.y / state.preset.options.stepsPerFrame : 0);
 
     canvas.ctx.beginPath();
     canvas.ctx.arc(

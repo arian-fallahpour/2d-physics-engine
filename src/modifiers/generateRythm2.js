@@ -2,12 +2,9 @@ import Modifier from "../classes/Modifier";
 import Vector from "../classes/Vector";
 import Wall from "../classes/objects/Wall";
 import engine from "../data/engine";
-import options from "../data/options";
 
 import * as model from "../model";
 import playToneTemplate from "./playTone";
-
-const cps = 60 * options.requestFrameCount; // Steps per second
 
 /**
  * NOTES
@@ -28,9 +25,11 @@ const generateRythm2 = ({
   firstTime = 1,
   wallThickness = 5,
 }) => {
+  const cps = 60 * model.state.preset.options.stepsPerFrame; // Steps per second
+
   // Remove duplicate notes and limit number of notes
   const notes = getNotes();
-  console.log(notes);
+  // console.log(notes);
 
   // Wall/ball data
   const positions = [];

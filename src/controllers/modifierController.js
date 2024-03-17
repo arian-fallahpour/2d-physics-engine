@@ -3,7 +3,6 @@ import { state } from "../model";
 import notes from "../data/notes";
 
 import Vector from "../classes/Vector";
-import options from "../data/options";
 import Sound from "../classes/Sound";
 import Melody from "../classes/Melody";
 import Circle from "../classes/objects/Circle";
@@ -235,7 +234,7 @@ export const platformsBallModifiers = (pegsData) => {
 // CIRCLES
 export const shrinkingCircleModifier = (circle, reverter, decrement = 0.1) => {
   const passiveChange = () => {
-    circle.radius -= decrement / options.requestFrameCount;
+    circle.radius -= decrement / state.preset.options.stepsPerFrame;
   };
 
   const revert = () => {

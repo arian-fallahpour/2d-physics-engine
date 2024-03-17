@@ -6,18 +6,20 @@ class Preset {
     before: [],
     after: [],
   };
-  steps = 4;
 
   constructor({
     name = `preset-${Math.random()}-${Date.now()}`,
     initializer = function () {},
     canvas = {},
-    options = { displayFPS: false },
+    options = {},
   }) {
     this.name = name;
     this.canvas = new Canvas(canvas);
     this.initializer = initializer;
-    this.options = options;
+    this.options = {
+      displayFPS: options.displayFPS || false,
+      stepsPerFrame: options.stepsPerFrame || 4,
+    };
     this.objects = {
       balls: [],
       circles: [],
@@ -28,13 +30,10 @@ class Preset {
       points: [],
       springs: [],
     };
-
-    this.init();
   }
 
   init() {
     this.initializer(this);
-    this.initialized = true;
   }
 
   addObjects(type, ...objects) {

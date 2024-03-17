@@ -1,6 +1,5 @@
 import { state } from "../model";
 
-import options from "../data/options";
 import engine from "../data/engine";
 import Entity from "../classes/objects/Entity";
 import {
@@ -168,7 +167,7 @@ export const requestNextFrame = (firstFrame = false) => {
   if (!firstFrame) {
     if (!state.play) return;
 
-    for (let i = 0; i < options.requestFrameCount; i++) {
+    for (let i = 0; i < state.preset.options.stepsPerFrame; i++) {
       requestAnimationFrame(frameHandler);
     }
     return;
@@ -178,7 +177,7 @@ export const requestNextFrame = (firstFrame = false) => {
 };
 
 const calculateFrameMetrics = (timeMs) => {
-  if (engine.frame % options.requestFrameCount === 0) {
+  if (engine.frame % state.preset.options.stepsPerFrame === 0) {
     engine.frameTime = timeMs - engine.timeMs;
     engine.framesPerSecond =
       engine.frameTime === 0 ? null : 1000 / engine.frameTime;
