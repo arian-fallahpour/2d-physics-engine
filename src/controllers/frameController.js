@@ -34,7 +34,8 @@ const frameHandler = (timeMs) => {
 
   // Get current preset
   const preset = state.preset;
-  const { walls, balls, circles, fractals, texts } = preset.objects;
+  const { walls, balls, circles, fractals, texts, points, springs } =
+    preset.objects;
 
   // Apply modifiers before render
   preset.modify("before");
@@ -46,7 +47,6 @@ const frameHandler = (timeMs) => {
   Entity.render(walls);
   Entity.render(fractals);
   Entity.render(texts);
-
   Entity.render(circles, (circle1, i) => {
     // Check if penetrating other circles
     circles.forEach((circle2, j) => {
@@ -94,7 +94,6 @@ const frameHandler = (timeMs) => {
       resolveCircleWallCollision(circle1, wall);
     });
   });
-
   Entity.render(balls, (ball1, i) => {
     // Check if penetrating any other balls
     balls.forEach((ball2, j) => {
@@ -154,6 +153,8 @@ const frameHandler = (timeMs) => {
       resolveBallWallCollision(ball1, wall);
     });
   });
+  Entity.render(springs);
+  Entity.render(points);
 
   // Apply modifiers after render
   preset.modify("after");

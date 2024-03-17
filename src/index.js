@@ -17,20 +17,22 @@ import breakout from "./presets/breakout";
 import digitsOfPI from "./presets/digitsOfPI";
 import testing from "./presets/testing";
 import circlesInCircles from "./presets/circlesInCircles";
+import pendulums from "./presets/pendulums";
 
 const main = () => {
   // Load presets
   model.loadPresets(
+    breakout,
+    pendulums,
+    chaosTheory,
+    testing,
+    singleBall,
+    platformRythms,
     circlesInCircles,
     bouncingCircles,
-    platformRythms,
-    testing,
-    breakout,
     digitsOfPI,
-    chaosTheory,
     circularBalls,
     fractalOpen,
-    singleBall,
     plinko,
     borderedBall,
     multipleBalls

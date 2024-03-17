@@ -25,6 +25,8 @@ class Preset {
       fractals: [],
       vectors: [],
       texts: [],
+      points: [],
+      springs: [],
     };
 
     this.init();

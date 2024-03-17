@@ -21,12 +21,7 @@ class Circle extends Entity {
   }
 
   draw() {
-    const { canvas } = state.preset;
-
-    // Draw shadow
-    if (this.shadowColor !== "transparent") {
-      this.drawShadow();
-    }
+    const canvas = state.preset.canvas;
 
     canvas.ctx.beginPath();
     canvas.ctx.lineWidth = this.thickness;
@@ -47,7 +42,8 @@ class Circle extends Entity {
   }
 
   drawShadow() {
-    const { canvas } = state.preset;
+    const canvas = state.preset.canvas;
+
     canvas.ctx.beginPath();
 
     const inner = Math.min(this.shadowLength, this.radius);

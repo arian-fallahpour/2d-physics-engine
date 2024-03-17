@@ -5,11 +5,13 @@ import Circle from "../classes/objects/Circle";
 import Vector from "../classes/Vector";
 
 const initializer = (preset) => {
+  // preset.canvas.setMode("trail");
+
   const circleRadius = 200;
   const ballsCount = 3000;
-  const velDirection = new Vector(0, 1);
+  const direction = new Vector(1, 1);
   const velMagnitude = 5;
-  const totalAngle = Math.PI;
+  const totalAngle = Math.PI / 6;
 
   // 1. Create circle
   const circle = new Circle({
@@ -32,18 +34,16 @@ const initializer = (preset) => {
         preset.canvas.element.clientWidth / 2,
         preset.canvas.element.clientHeight / 2
       ),
-      appliedAcc: new Vector(0, -0.05),
+      accs: { gravity: new Vector(0, -0.05) },
       color: `hsl(${((i / ballsCount) * 180 + 250) % 360}, 70%, 50%)`,
       radius: 1,
       strokeColor: "transparent",
     });
-    ball.setVel(
-      velDirection
-        .unit()
-        .rotate(-totalAngle / 2)
-        .rotate((i / ballsCount) * totalAngle)
-        .multiply(velMagnitude)
-    );
+    ball.vel = direction
+      .unit()
+      .rotate(-totalAngle / 2)
+      .rotate((i / ballsCount) * totalAngle)
+      .multiply(velMagnitude);
     balls.push(ball);
   }
   preset.addObjects("balls", ...balls);

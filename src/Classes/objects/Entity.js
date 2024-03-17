@@ -28,12 +28,8 @@ class Entity {
     shadow: "",
   };
 
-  // Final acc value
-  acc = new Vector(0, 0);
-
   // Controlled movement
   _moving = {
-    acc: new Vector(0, 0),
     up: false,
     down: false,
     right: false,
@@ -43,13 +39,13 @@ class Entity {
   constructor({
     pos = new Vector(0, 0),
     vel = new Vector(0, 0),
-    appliedAcc = new Vector(0, 0),
-    forces = [],
     maxVel,
+    accs = {},
+    movingMagnitude = 0.75,
 
     color = "white",
     strokeColor = "transparent",
-    textColor = "black",
+    textColor = "white",
     shadowColor = "transparent",
     shadowLength = 50,
 
@@ -59,15 +55,17 @@ class Entity {
     friction = 0,
 
     name = `${this.constructor.name}-${Math.random()}-${Date.now()}`,
+
+    displayPath = false,
     displayVectors = false,
     displayInfo = [],
     controls = false,
   }) {
     this.pos = pos;
     this.vel = vel;
-    this.appliedAcc = appliedAcc;
     this.maxVel = maxVel;
-    this.forces = forces;
+    this.accs = accs;
+    this.movingMagnitude = movingMagnitude;
 
     this.color = color;
     this.strokeColor = strokeColor;
@@ -86,44 +84,12 @@ class Entity {
     this.controls = controls;
 
     if (this.controls) {
-      this.controlMovement();
+      this.keyControls();
     }
   }
 
   get inverseMass() {
     return this.mass > 0 ? 1 / this.mass : 0;
-  }
-
-  setAppliedAcc(acc) {
-    this.appliedAcc = acc;
-  }
-
-  setVel(vel) {
-    this.vel = vel;
-  }
-
-  setPos(pos) {
-    this.pos = pos;
-  }
-
-  freeze() {
-    this._frozen.vel = this.vel;
-    this._frozen.appliedAcc = this.appliedAcc;
-
-    this.vel = new Vector(0, 0);
-    this.appliedAcc = new Vector(0, 0);
-  }
-
-  unfreeze() {
-    this.vel = this._frozen.vel;
-    this.appliedAcc = this._frozen.appliedAcc;
-
-    this._frozen = {};
-  }
-
-  setMass(mass) {
-    this.mass = mass;
-    this.inverseMass = mass > 0 ? 1 / mass : 0;
   }
 
   setInitial() {
@@ -138,10 +104,48 @@ class Entity {
     return this._colors[colorType];
   }
 
+  getTotalAcc() {
+    return Object.entries(this.accs).reduce(
+      (p, c) => p.add(c[1]),
+      new Vector(0, 0)
+    );
+  }
+
+  update() {
+    if (this.drawTail && this.tailLength !== 0) {
+      this.drawTail();
+    }
+
+    if (this.drawShadow && this.shadowColor !== "transparent") {
+      this.drawShadow();
+    }
+
+    this.draw();
+
+    if (this.drawImage && this.image) {
+      this.drawImage();
+    }
+
+    if (this.drawVectors && this.displayVectors) {
+      this.drawVectors();
+    }
+
+    if (this.drawInfo && this.displayInfo.length !== 0) {
+      this.drawInfo();
+    }
+
+    const affecters = ["Spring"];
+    if (affecters.includes(this.constructor.name)) {
+      this.affect();
+    }
+
+    this.reposition();
+  }
+
   reposition() {
-    this.acc = this.appliedAcc.add(this._moving.acc);
+    const acc = this.getTotalAcc();
     this.vel = this.vel
-      .add(this.acc.divide(options.requestFrameCount))
+      .add(acc.divide(options.requestFrameCount))
       .multiply(1 - this.friction);
 
     // Limit velocity if maxVel exists
@@ -155,10 +159,8 @@ class Entity {
     this.pos = this.pos.add(this.vel.divide(options.requestFrameCount));
   }
 
-  controlMovement() {
+  keyControls() {
     const events = ["keydown", "keyup"];
-
-    const magnitude = 0.6;
     const direction = new Vector(0, 0);
 
     events.forEach((event) => {
@@ -197,7 +199,10 @@ class Entity {
           direction.x = 0;
         }
 
-        this._moving.acc = direction.unit().multiply(magnitude);
+        this.accs.movement = direction
+          .unit()
+          .multiply(this.movingMagnitude)
+          .divide(options.requestFrameCount);
       });
     });
   }
@@ -339,8 +344,8 @@ class Entity {
       // Apply modifiers
       object.modify("passive");
 
-      // Draw object
-      object.draw();
+      // Update object on canvas
+      object.update();
 
       // Callback function
       cb(object, i, arr);

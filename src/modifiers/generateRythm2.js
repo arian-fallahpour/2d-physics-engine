@@ -96,8 +96,8 @@ const generateRythm2 = ({
         wallsData.splice(note, 1);
         walls.splice(note, 1);
 
-        ball.setPos(note > 0 ? positions[note - 1] : ball.initial.pos);
-        ball.setVel(note > 0 ? velocities[note - 1] : ball.initial.vel);
+        ball.pos = note > 0 ? positions[note - 1] : ball.initial.pos;
+        ball.vel = note > 0 ? velocities[note - 1] : ball.initial.vel;
       }
 
       // If not, or no longer faulty
@@ -177,8 +177,8 @@ const generateRythm2 = ({
       wallsData[note - 1].end = ball.pos.x + 1;
 
       // Set ball's position to start
-      ball.setPos(ball.initial.pos);
-      ball.setVel(ball.initial.vel);
+      ball.pos = ball.initial.pos;
+      ball.vel = ball.initial.vel;
     }
   };
 

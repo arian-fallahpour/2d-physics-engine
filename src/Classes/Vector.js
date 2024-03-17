@@ -43,7 +43,7 @@ class Vector {
   }
 
   draw(pos = new Vector(0, 0), color = "white", factor = 1) {
-    const { canvas } = state.preset;
+    const canvas = state.preset.canvas;
 
     canvas.ctx.beginPath();
     canvas.ctx.lineWidth = 1;

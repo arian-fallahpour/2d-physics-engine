@@ -90,7 +90,7 @@ export const resolveBallWallPenetration = (ball, wall) => {
     ball.radius + (wall.thickness - 1) / 2 - distance.magnitude();
 
   // Account for collisions that occur between frames
-  // penetrationDepth += (fps / 1000) * ball.vel.magnitude();
+  penetrationDepth += (fps / 1000) * ball.vel.magnitude();
 
   const resolution = normal.multiply(penetrationDepth);
 
@@ -102,7 +102,10 @@ export const resolveBallCirclePenetration = (ball, circle) => {
   const distance = closestPoint.subtract(ball.pos);
 
   let penetrationDepth =
-    ball.radius + circle.thickness / 2 - distance.magnitude();
+    ball.radius +
+    ball.thickness / 2 +
+    circle.thickness / 2 -
+    distance.magnitude();
 
   // Account for collisions that occur between frames
   penetrationDepth += (fps / 1000) * ball.vel.magnitude();

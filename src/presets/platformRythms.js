@@ -26,11 +26,12 @@ import tetrisMIDI from "../songs/midis/tetris.json";
 import blindingLightsMIDI from "../songs/midis/blindingLights.json";
 
 const initializer = (preset) => {
-  const generated = arabianNightsGen;
-  const isGenerating = false;
+  // NOTE: IF BUGS OUT, PENETRATION RESOLUTION TRICK MAY BE REASON WHY
+  const generated = keroseneGen;
+  const isGenerating = true;
   const options = {
-    midi: arabianNightsMIDI,
-    track: 0,
+    midi: keroseneMIDI,
+    track: 4,
     notesStart: 0,
     notesCount: 100,
     wallThickness: 7,
@@ -42,12 +43,9 @@ const initializer = (preset) => {
   if (isGenerating) {
     const ball = new Ball({
       radius: 15,
-      pos: new Vector(
-        preset.canvas.element.clientWidth / 2,
-        preset.canvas.element.clientHeight / 2
-      ),
+      pos: preset.canvas.center,
       vel: new Vector(4, 0),
-      appliedAcc: new Vector(0, -0.5),
+      accs: { gravity: new Vector(0, -0.5) },
       color: "white",
       strokeColor: "transparent",
     });
@@ -68,13 +66,14 @@ const initializer = (preset) => {
       ...ballInitial,
       color: "rainbow",
       tailLength: 30,
-      appliedAcc: new Vector(
-        ballInitial.appliedAcc.x,
-        ballInitial.appliedAcc.y
-      ),
+      accs: {
+        gravity: new Vector(
+          ballInitial.accs.gravity.x,
+          ballInitial.accs.gravity.y
+        ),
+      },
       vel: new Vector(ballInitial.vel.x, ballInitial.vel.y),
       pos: new Vector(ballInitial.pos.x, ballInitial.pos.y),
-      // image: "src/images/piggy.png",
     });
     preset.addObjects("balls", ball);
     preset.canvas.focusOn(ball);

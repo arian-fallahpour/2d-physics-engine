@@ -28,17 +28,9 @@ class Wall extends Entity {
   }
 
   draw() {
-    // Draw shadow
-    if (this.shadowColor !== "transparent") {
-      this.drawShadow();
-    }
+    const canvas = state.preset.canvas;
 
-    this.drawLine();
-  }
-
-  drawLine() {
-    const { canvas } = state.preset;
-
+    // Draw line
     canvas.ctx.beginPath();
     canvas.ctx.lineWidth = this.thickness;
     canvas.ctx.lineCap = this.edges;

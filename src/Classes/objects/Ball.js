@@ -1,9 +1,8 @@
-import { state } from "../../model";
-import Vector from "../Vector";
-
-import Entity from "./Entity";
-
 import options from "../../data/options";
+import { state } from "../../model";
+
+import Vector from "../Vector";
+import Entity from "./Entity";
 
 class Ball extends Entity {
   _tail = [];
@@ -24,19 +23,7 @@ class Ball extends Entity {
     this.setInitial();
   }
 
-  // DRAW FUNCTIONS
   draw() {
-    // Leave trail behind
-    if (this.tailLength !== 0) {
-      this.drawTail();
-    }
-
-    // Draw shadow
-    if (this.shadowColor !== "transparent") {
-      this.drawShadow();
-    }
-
-    // Draw circle
     this.drawCircle({
       pos: this.pos,
       radius: this.radius,
@@ -46,24 +33,6 @@ class Ball extends Entity {
       shadowLength: this.shadowLength,
       thickness: this.thickness,
     });
-
-    // Draw image if exists
-    if (this.image) {
-      this.drawImage();
-    }
-
-    // Reposition ball
-    this.reposition();
-
-    // Draw movement vectors
-    if (this.displayVectors) {
-      this.drawVectors();
-    }
-
-    // Draw ball information
-    if (this.displayInfo.length) {
-      this.drawInfo();
-    }
   }
 
   drawTail() {
@@ -141,7 +110,7 @@ class Ball extends Entity {
   }
 
   drawCircle({ pos, radius, color, strokeColor, thickness }) {
-    const { canvas } = state.preset;
+    const canvas = state.preset.canvas;
 
     canvas.ctx.beginPath();
 
@@ -194,14 +163,6 @@ class Ball extends Entity {
     canvas.ctx.restore();
   }
 
-  drawVectors() {
-    this.vel
-      .unit()
-      .multiply(2 * this.radius)
-      .draw(this.pos.x, this.pos.y, "blue");
-    this.acc.unit().multiply(this.radius).draw(this.pos.x, this.pos.y, "red");
-  }
-
   drawInfo() {
     const { canvas } = state.preset;
 
@@ -250,6 +211,19 @@ class Ball extends Entity {
           this.pos.y + ((props.length - 1) * lineHeight) / 2 - i * lineHeight
         )
       );
+    });
+  }
+
+  drawVectors() {
+    this.vel
+      .unit()
+      .multiply(3 * this.radius)
+      .draw(this.pos, "white");
+    Object.keys(this.accs).forEach((key) => {
+      this.accs[key]
+        .unit()
+        .multiply(2 * this.radius)
+        .draw(this.pos, "white");
     });
   }
 }
