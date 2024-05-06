@@ -1,6 +1,6 @@
 import Modifier from "../classes/Modifier";
 import Vector from "../classes/Vector";
-import Wall from "../classes/objects/Wall";
+import Wall from "../classes/shapes/Wall";
 
 import engine from "../data/engine";
 

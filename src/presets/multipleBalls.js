@@ -1,8 +1,8 @@
 import Preset from "../classes/Preset";
 import canvas from "../classes/Canvas";
 
-import Ball from "../classes/objects/Ball";
-import Circle from "../classes/objects/Circle";
+import Ball from "../classes/shapes/entities/Ball";
+import Circle from "../classes/shapes/entities/Circle";
 import Vector from "../classes/Vector";
 
 import {

@@ -1,38 +1,34 @@
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Ball from "../classes/objects/Ball";
-import Wall from "../classes/objects/Wall";
+import Ball from "../classes/shapes/entities/Ball";
+import Wall from "../classes/shapes/Wall";
+import Text from "../classes/shapes/entities/Text";
 import Modifier from "../classes/Modifier";
-import Text from "../classes/objects/Text";
+import playSound from "../modifiers/playSound";
 import countCollisions from "../modifiers/countCollisions";
-import playTone from "../modifiers/playTone";
 
 const initializer = (preset) => {
   const biggerBallMass = 100 ** 4;
   const separation = 200;
-  const textSetter = (collisions) => `${collisions} collisions`;
-  const center = new Vector(
-    preset.canvas.element.clientWidth / 2,
-    preset.canvas.element.clientHeight / 2
-  );
+  const setText = (collisions) => `${collisions} collisions`;
 
   // 1. Create text
   const text = new Text({
-    pos: center.add(new Vector(0, separation)),
+    pos: preset.canvas.center.add(new Vector(0, separation)),
     color: "white",
-    content: textSetter(0),
+    content: setText(0),
   });
 
   // 2. Create bigger ball
   const biggerBall = new Ball({
     mass: biggerBallMass,
     name: `${biggerBallMass}kg`,
-    color: "transparent",
-    strokeColor: "white",
-    textColor: "white",
+    fill: "transparent",
+    stroke: "white",
+    text: "white",
     radius: 50,
-    pos: center.add(new Vector(-(separation / 2), 0), 0),
-    vel: new Vector(5, 0),
+    pos: preset.canvas.center.add(new Vector(-separation / 2, 0)),
+    vel: new Vector(3, 0),
     displayInfo: ["name"],
   });
 
@@ -40,30 +36,25 @@ const initializer = (preset) => {
   const smallerBall = new Ball({
     mass: 1,
     name: "1kg",
-    color: "transparent",
-    strokeColor: "white",
-    textColor: "white",
-    pos: center.add(new Vector(separation / 2, 0), 0),
+    fill: "transparent",
+    stroke: "white",
+    text: "white",
+    pos: preset.canvas.center.add(new Vector(separation / 2, 0)),
     displayInfo: ["name"],
+    radius: 25,
   });
+  const playSoundModifier = new Modifier();
   const countCollisionsModifier = new Modifier();
-  const playToneModifier = new Modifier();
-  countCollisionsModifier.use(countCollisions, text, textSetter);
-  playToneModifier.use(playTone, { name: "A4", duration: 0.01 });
+  playSoundModifier.use(playSound, "ball-hit.mp3");
+  countCollisionsModifier.use(countCollisions, text, setText);
+  smallerBall.addModifier(playSoundModifier);
   smallerBall.addModifier(countCollisionsModifier);
-  smallerBall.addModifier(playToneModifier);
 
   // 4. Add wall
   const wall = new Wall({
-    start: new Vector(
-      preset.canvas.element.clientWidth / 2 + separation,
-      preset.canvas.element.clientHeight / 2 + 100
-    ),
-    end: new Vector(
-      preset.canvas.element.clientWidth / 2 + separation,
-      preset.canvas.element.clientHeight / 2 - 100
-    ),
-    thickness: 3,
+    start: preset.canvas.center.add(new Vector(separation, 100)),
+    end: preset.canvas.center.add(new Vector(separation, -100)),
+    thickness: 5,
     strokeColor: "white",
   });
 
@@ -76,6 +67,9 @@ const initializer = (preset) => {
 const digitsOfPI = new Preset({
   name: "digits of PI",
   initializer,
+  options: {
+    stepsPerFrame: 1000,
+  },
 });
 
 export default digitsOfPI;

@@ -1,23 +1,25 @@
-import { state } from "../../model";
+import { state } from "../../../model";
+import Shape from "../Shape";
 import Entity from "./Entity";
 
-class Circle extends Entity {
+class Circle extends Shape(Entity) {
   constructor({
     radius = 100,
+
     mass = 0,
-    color = "transparent",
-    strokeColor = "white",
+    fill = "transparent",
+    stroke = "white",
     ...otherArgs
   }) {
     otherArgs.mass = mass;
-    otherArgs.color = color;
-    otherArgs.strokeColor = strokeColor;
+    otherArgs.fill = fill;
+    otherArgs.stroke = stroke;
 
     super(otherArgs);
 
     this.radius = radius;
 
-    this.setInitial();
+    this.initial = { ...this };
   }
 
   draw() {
@@ -33,9 +35,9 @@ class Circle extends Entity {
       2 * Math.PI
     );
     canvas.ctx.strokeWidth = this.thickness;
-    canvas.ctx.strokeStyle = this.getColor("stroke");
+    canvas.ctx.strokeStyle = this._colors.stroke;
     canvas.ctx.stroke();
-    canvas.ctx.fillStyle = this.getColor("fill");
+    canvas.ctx.fillStyle = this._colors.fill;
     canvas.ctx.fill();
 
     this.reposition();
@@ -46,8 +48,8 @@ class Circle extends Entity {
 
     canvas.ctx.beginPath();
 
-    const inner = Math.min(this.shadowLength, this.radius);
-    const outer = this.shadowLength;
+    const inner = Math.min(this.shadowBlur, this.radius);
+    const outer = this.shadowBlur;
     const gradient = canvas.ctx.createRadialGradient(
       this.pos.x,
       canvas.toCanvasY(this.pos.y),
@@ -58,7 +60,7 @@ class Circle extends Entity {
     );
 
     gradient.addColorStop(0, "transparent");
-    gradient.addColorStop(inner / (inner + outer), this.getColor("shadow"));
+    gradient.addColorStop(inner / (inner + outer), this._colors.shadow);
     gradient.addColorStop(1, "transparent");
 
     canvas.ctx.arc(

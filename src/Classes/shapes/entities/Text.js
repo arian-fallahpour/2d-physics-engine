@@ -1,16 +1,17 @@
-import { state } from "../../model";
-import Entity from "./Entity";
+import Shape from "../Shape";
+import { state } from "../../../model";
 
-class Text extends Entity {
+class Text extends Shape() {
   constructor({
     content = "",
     centered = true,
     fontFamily = "Monospace",
     fontSize = 20,
-    color = "white",
+    fill = "white",
+    pos,
     ...otherArgs
   }) {
-    otherArgs.color = color;
+    otherArgs.fill = fill;
 
     super(otherArgs);
 
@@ -18,16 +19,17 @@ class Text extends Entity {
     this.centered = centered;
     this.fontSize = fontSize;
     this.fontFamily = fontFamily;
+    this.pos = pos;
 
     // InitialState
-    this.setInitial();
+    this.initial = { ...this };
   }
 
   draw() {
     const { canvas } = state.preset;
 
     canvas.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-    canvas.ctx.fillStyle = this.getColor("fill");
+    canvas.ctx.fillStyle = this._colors.fill;
 
     if (this.centered) {
       canvas.ctx.textBaseline = "middle";
@@ -35,6 +37,10 @@ class Text extends Entity {
     }
 
     canvas.ctx.fillText(this.content, this.pos.x, canvas.toCanvasY(this.pos.y));
+  }
+
+  update() {
+    this.draw();
   }
 }
 

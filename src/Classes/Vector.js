@@ -42,7 +42,7 @@ class Vector {
     return this.x * vector.x + this.y * vector.y;
   }
 
-  draw(pos = new Vector(0, 0), color = "white", factor = 1) {
+  draw(pos = new Vector(0, 0), stroke = "white", factor = 1) {
     const canvas = state.preset.canvas;
 
     canvas.ctx.beginPath();
@@ -52,7 +52,7 @@ class Vector {
       pos.x + this.x * factor,
       canvas.toCanvasY(pos.y + this.y * factor)
     );
-    canvas.ctx.strokeStyle = color;
+    canvas.ctx.strokeStyle = stroke;
     canvas.ctx.stroke();
   }
 

@@ -2,6 +2,7 @@ import Canvas from "./Canvas";
 
 class Preset {
   initialized = false;
+  data = {};
   _modifiers = {
     before: [],
     after: [],
@@ -17,8 +18,37 @@ class Preset {
     this.canvas = new Canvas(canvas);
     this.initializer = initializer;
     this.options = {
-      displayFPS: options.displayFPS || false,
+      displayMetrics: options.displayMetrics || false,
       stepsPerFrame: options.stepsPerFrame || 4,
+      reduceVelError: options.reduceVelError || false,
+      ODESolverMethod: options.ODESolverMethod || "euler",
+      collisions: {
+        ballToBall:
+          options.collisions &&
+          typeof options.collisions.ballToBall === "boolean"
+            ? options.collisions.ballToBall
+            : true,
+        ballToWall:
+          options.collisions &&
+          typeof options.collisions.ballToWall === "boolean"
+            ? options.collisions.ballToWall
+            : true,
+        ballToCircle:
+          options.collisions &&
+          typeof options.collisions.ballToCircle === "boolean"
+            ? options.collisions.ballToCircle
+            : true,
+        circleToCircle:
+          options.collisions &&
+          typeof options.collisions.circleToCircle === "boolean"
+            ? options.collisions.circleToCircle
+            : true,
+        circleToWall:
+          options.collisions &&
+          typeof options.collisions.ballToBall === "boolean"
+            ? options.collisions.ballToBall
+            : true,
+      },
     };
     this.objects = {
       balls: [],
@@ -28,8 +58,8 @@ class Preset {
       vectors: [],
       texts: [],
       points: [],
-      springs: [],
     };
+    this.interactions = [];
   }
 
   init() {
@@ -40,6 +70,10 @@ class Preset {
     this.objects[type].push(...objects);
   }
 
+  addInteractions(...interactions) {
+    this.interactions.push(...interactions);
+  }
+
   popObjects(type) {
     this.objects[type].pop();
   }
@@ -48,8 +82,8 @@ class Preset {
     this._modifiers[modifier.occurance].push(modifier);
   }
 
-  modify(occcurance) {
-    this._modifiers[occcurance].forEach((modifier) => modifier.apply(this));
+  modify(occcurance, preset) {
+    this._modifiers[occcurance].forEach((modifier) => modifier.apply(preset));
   }
 }
 

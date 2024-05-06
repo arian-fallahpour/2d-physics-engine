@@ -1,7 +1,8 @@
-import Vector from "./Vector";
-import Entity from "./objects/Entity";
+import Shape from "./Shape";
+import Vector from "../Vector";
+import Entity from "./entities/Entity";
 
-class Fractal extends Entity {
+class Fractal extends Shape(Entity) {
   vectors = [];
 
   constructor({
@@ -19,7 +20,7 @@ class Fractal extends Entity {
     this.angle = angle;
 
     // InitialState
-    this.setInitial();
+    this.initial = { ...this };
   }
 
   /** Constructs fractals and their positions */
@@ -30,7 +31,7 @@ class Fractal extends Entity {
     // First branch
     const v = new Vector(0, this.baseLength);
     this.vectors.push([{ vector: v, pos: this.pos }]);
-    v.draw(this.pos, this.color);
+    v.draw(this.pos, this.fill);
 
     // Fill this.vectors with layers that are filled with vectors
     for (let i = 1; i < this.layers; i++) {
@@ -49,7 +50,7 @@ class Fractal extends Entity {
             .rotate(totalAngle / 2 + k * -this.angle)
             .unit()
             .multiply(magnitude);
-          v.draw(pos, this.color);
+          v.draw(pos, this.fill);
           this.vectors[i].push({ vector: v, pos });
         }
       }

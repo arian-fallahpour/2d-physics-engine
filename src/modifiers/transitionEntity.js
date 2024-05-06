@@ -4,7 +4,7 @@ const defaultValue = {
   duration: 1,
 };
 
-const transitionEntityTemplate = (entity, ...transitions) => {
+const transitionTemplate = (entity, ...transitions) => {
   if (!transitions.length) transitions = defaultValue;
 
   return (data) => {
@@ -14,4 +14,4 @@ const transitionEntityTemplate = (entity, ...transitions) => {
   };
 };
 
-export default transitionEntityTemplate;
+export default transitionTemplate;

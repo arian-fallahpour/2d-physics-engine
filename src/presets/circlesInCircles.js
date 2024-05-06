@@ -1,9 +1,9 @@
 import Modifier from "../classes/Modifier";
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Ball from "../classes/objects/Ball";
-import Circle from "../classes/objects/Circle";
-import Wall from "../classes/objects/Wall";
+import Ball from "../classes/shapes/entities/Ball";
+import Circle from "../classes/shapes/entities/Circle";
+import Wall from "../classes/shapes/Wall";
 
 const initializer = (preset) => {
   const circlesCount = 13;
@@ -63,7 +63,7 @@ const initializer = (preset) => {
       ...circle.initial,
       pos: circle.pos,
       radius: circle.radius - circle.thickness * 2 * i,
-      color: i === circlesCount - 1 ? "white" : circle.initial.color,
+      fill: i === circlesCount - 1 ? "white" : circle.initial.fill,
     });
 
     if (i < circlesCount - 1) {

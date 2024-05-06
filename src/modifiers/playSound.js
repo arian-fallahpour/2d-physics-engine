@@ -1,18 +1,14 @@
 import Sound from "../classes/Sound";
 import notes from "../data/notes";
-import * as model from "../model";
+import { state } from "../model";
 
-const playSound = (instrument, noteName) => {
-  if (!model.state.sounds[instrument]) {
-    model.state.sounds[instrument] = new Sound(
-      instrument,
-      noteName ? Sound.sprite(notes, 500) : undefined
-    );
+const playSound = (file) => {
+  if (!state.audio.sounds[file]) {
+    state.audio.sounds[file] = new Sound(file);
   }
 
   return (data) => {
-    console.log(model.state.sounds);
-    model.state.sounds[instrument].play(noteName);
+    state.audio.sounds[file].play();
   };
 };
 

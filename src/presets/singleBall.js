@@ -1,112 +1,82 @@
 import Preset from "../classes/Preset";
 
-import Ball from "../classes/objects/Ball";
-import Circle from "../classes/objects/Circle";
+import Ball from "../classes/shapes/entities/Ball";
+import Circle from "../classes/shapes/entities/Circle";
 import Vector from "../classes/Vector";
+import Point from "../classes/shapes/entities/Point";
 
 import Modifier from "../classes/Modifier";
 import changeProp from "../modifiers/changeProp";
-import playMelody from "../modifiers/playMelody";
+import playTone from "../modifiers/playTone";
 
-import keroseneMIDI from "../songs/midis/kerosene.json";
-import revert from "../modifiers/revert";
+import AccGenerator from "../classes/AccGenerator";
+
+import MIDI from "../songs/midis/pedro.json";
+import Text from "../classes/shapes/entities/Text";
+import ConstantAcc from "../classes/interactions/ConstantAcc";
+import Wall from "../classes/shapes/Wall";
+import SoftConstraint from "../classes/interactions/SoftConstraint";
 
 const initializer = (preset) => {
-  const ballGrowth = 0.75;
-  const ballSpeedFactor = 1;
-  const circleShrink = 0.05;
-  const circleGrowth = 3;
-  const revertDuration = 0.5 * 60;
-
-  preset.canvas.setMode("normal");
-
-  // 1. Create Circles
+  // 1. Create Circle
   const circle = new Circle({
     pos: preset.canvas.center,
     radius: 200,
-    strokeColor: "rainbow",
-    thickness: 5,
+    thickness: 10,
+    elasticity: 1.005,
   });
-  // const decreasingCircleRadiusModifier = new Modifier({ type: "passive" });
-  // const increaseCircleRadiusModifier = new Modifier();
-  // decreasingCircleRadiusModifier.use(
-  //   changeProp,
-  //   circle,
-  //   (entity) => (entity.radius -= circleShrink)
-  // );
-  // increaseCircleRadiusModifier.use(
-  //   changeProp,
-  //   circle,
-  //   (entity) => (entity.radius += circleGrowth)
-  // );
-  // circle.addModifier(decreasingCircleRadiusModifier);
-  // circle.addModifier(increaseCircleRadiusModifier);
 
-  // 2. Create balls
   const ball1 = new Ball({
-    pos: preset.canvas.center.add(new Vector(50, 0)),
+    pos: preset.canvas.center.add(new Vector(-100, 0)),
     radius: 15,
-    accs: { gravity: new Vector(0, -0.4) },
-    color: "rainbow",
-    vel: new Vector(0, 8).rotate(Math.PI * 2 * Math.random()),
+    accs: { gravity: new ConstantAcc(0, -0.4) },
+    fill: "rainbow",
   });
+  const playToneModifier1 = new Modifier();
+  playToneModifier1.use(playTone, MIDI.tracks[0]);
+  ball1.addModifier(playToneModifier1);
+
   const ball2 = new Ball({
-    pos: preset.canvas.center.add(new Vector(-50, 0)),
+    pos: preset.canvas.center.add(new Vector(100, 0)),
     radius: 15,
-    accs: { gravity: new Vector(0, -0.4) },
-    color: "rainbow",
-    vel: new Vector(0, 8).rotate(Math.PI * 2 * Math.random()),
+    accs: { gravity: new ConstantAcc(0, -0.4) },
+    fill: "rainbow",
   });
-  // const increaseBallRadiusModifier = new Modifier();
-  // const increaseBallVelModifier = new Modifier();
-  // const playMelodyModifier = new Modifier();
-  // increaseBallRadiusModifier.use(
-  //   changeProp,
-  //   ball,
-  //   (entity) => (entity.radius += ballGrowth)
-  // );
-  // increaseBallVelModifier.use(
-  //   changeProp,
-  //   ball,
-  //   (entity) => (entity.vel = entity.vel.multiply(ballSpeedFactor))
-  // );
-  // playMelodyModifier.use(playMelody, keroseneMIDI, 4);
-  // ball.addModifier(increaseBallRadiusModifier);
-  // ball.addModifier(increaseBallVelModifier);
-  // ball.addModifier(playMelodyModifier);
+  const playToneModifier2 = new Modifier();
+  playToneModifier2.use(playTone, MIDI.tracks[0]);
+  ball2.addModifier(playToneModifier2);
 
-  // 3. Configure preset
-  // const revertPresetModifier = new Modifier({
-  //   type: "frame",
-  //   occurance: "after",
-  // });
-  // revertPresetModifier.use(
-  //   revert,
-  //   (preset) => ball.radius >= circle.radius,
-  //   (preset) => {
-  //     circle.clearModifiers();
-  //     ball.clearModifiers();
+  const spring = new SoftConstraint({
+    entity1: ball1,
+    entity2: ball2,
+    length: 100,
+    zigzagCount: 29,
+  });
 
-  //     circle.clearModifiers();
-  //     circle.transition("radius", circle.initial.radius, revertDuration);
-  //     ball.appliedAcc = new Vector(0, 0);
-  //     ball.vel = new Vector(0, 0);
-  //     ball.transition("radius", ball.initial.radius, revertDuration);
-  //     ball.transition("color", "red", revertDuration);
-  //     ball.transition("pos.x", ball.initial.pos.x, revertDuration);
-  //     ball.transition("pos.y", ball.initial.pos.y, revertDuration);
-  //   }
-  // );
-  // preset.addModifier(revertPresetModifier);
+  const collideModifier = new Modifier({ type: "active" });
+  collideModifier.use((ball) => {
+    return (data) => {
+      if (!ball1 && !ball2) return;
+
+      ball1.radius += 0.75;
+      ball2.radius += 0.75;
+      spring.length += 0.75;
+      spring.zigzagCount += 0.75;
+    };
+  });
+  ball2.addModifier(collideModifier);
 
   preset.addObjects("circles", circle);
   preset.addObjects("balls", ball1, ball2);
-  // preset.canvas.focusOn(ball);
+  preset.addInteractions(spring);
 };
 
 const singleBall = new Preset({
   name: "single ball",
   initializer,
+  options: {
+    reduceVelError: true,
+  },
 });
 
 export default singleBall;

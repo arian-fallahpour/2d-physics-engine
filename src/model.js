@@ -10,9 +10,13 @@ export const state = {
   presets: [],
   presetIndex: 0,
   preset: null,
-  sounds: {},
-  melodies: {},
-  tones: {},
+  audio: {
+    sounds: {},
+    melodies: {},
+    tones: {},
+    note: 0,
+  },
+
   engine: {},
 };
 

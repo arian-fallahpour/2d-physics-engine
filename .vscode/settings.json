@@ -1,6 +1,9 @@
 {
   "files.associations": {
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "queue": "c",
+    "stdlib.h": "c",
+    "string.h": "c"
   },
   "files.autoSave": "off",
   "editor.formatOnSave": true

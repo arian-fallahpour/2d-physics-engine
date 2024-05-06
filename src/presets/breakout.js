@@ -1,6 +1,6 @@
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Wall from "../classes/objects/Wall";
+import Wall from "../classes/shapes/Wall";
 
 const initializer = (preset) => {
   const columns = 10;

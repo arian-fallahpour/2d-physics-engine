@@ -1,13 +1,24 @@
-import { state } from "../../model";
+import { state } from "../../../model";
 
-import Vector from "../Vector";
+import Vector from "../../Vector";
 import Entity from "./Entity";
 
-class Ball extends Entity {
+import Shape from "../Shape";
+
+class Ball extends Shape(Entity) {
   _tail = [];
   _imageInstance;
 
-  constructor({ radius = 25, tailLength = 0, image, ...otherArgs }) {
+  constructor({
+    radius = 15,
+    fill = "white",
+    stroke = "transparent",
+    tailLength = 0,
+    image,
+    ...otherArgs
+  }) {
+    otherArgs.fill = fill;
+    otherArgs.stroke = stroke;
     super(otherArgs);
 
     this.radius = radius;
@@ -18,18 +29,17 @@ class Ball extends Entity {
       this.loadImage();
     }
 
-    // InitialState
-    this.setInitial();
+    this.initial = { ...this };
   }
 
   draw() {
     this.drawCircle({
       pos: this.pos,
       radius: this.radius,
-      color: this.getColor("fill"),
-      strokeColor: this.getColor("stroke"),
-      shadowColor: this.getColor("shadow"),
-      shadowLength: this.shadowLength,
+      color: this._colors.fill,
+      strokeColor: this._colors.stroke,
+      shadowColor: this._colors.shadow,
+      shadowBlur: this.shadowBlur,
       thickness: this.thickness,
     });
   }
@@ -38,8 +48,8 @@ class Ball extends Entity {
     const data = {
       pos: this.pos,
       radius: this.radius,
-      color: this.getColor("fill"),
-      strokeColor: this.getColor("stroke"),
+      color: this._colors.fill,
+      strokeColor: this._colors.stroke,
       thickness: this.thickness,
     };
 
@@ -57,22 +67,22 @@ class Ball extends Entity {
     // Render tail
     for (let i = 0; i < this._tail.length; i++) {
       this.drawCircle(this._tail[i]);
-
-      // const { canvas } = state.preset;
-
-      // canvas.ctx.beginPath();
-      // canvas.ctx.lineWidth = 1;
-      // canvas.ctx.lineCap = "round";
-
-      // for (let i = 0; i < this._tail.length; i++) {
-      //   canvas.ctx.lineTo(
-      //     this._tail[i].pos.x,
-      //     canvas.toCanvasY(this._tail[i].pos.y)
-      //   );
-      // }
-      // canvas.ctx.strokeStyle = this.getColor("fill");
-      // canvas.ctx.stroke();
     }
+
+    //   const { canvas } = state.preset;
+
+    //   canvas.ctx.beginPath();
+    //   canvas.ctx.lineWidth = 1;
+    //   canvas.ctx.lineCap = "round";
+
+    //   for (let i = 0; i < this._tail.length; i++) {
+    //     canvas.ctx.lineTo(
+    //       this._tail[i].pos.x,
+    //       canvas.toCanvasY(this._tail[i].pos.y)
+    //     );
+    //   }
+    //   canvas.ctx.strokeStyle = this.fill;
+    //   canvas.ctx.stroke();
   }
 
   drawShadow() {
@@ -80,8 +90,8 @@ class Ball extends Entity {
 
     canvas.ctx.beginPath();
 
-    const inner = Math.min(this.shadowLength, this.radius);
-    const outer = this.shadowLength;
+    const inner = Math.min(this.shadowBlur, this.radius);
+    const outer = this.shadowBlur;
     const gradient = canvas.ctx.createRadialGradient(
       this.pos.x,
       canvas.toCanvasY(this.pos.y),
@@ -92,7 +102,7 @@ class Ball extends Entity {
     );
 
     gradient.addColorStop(0, "transparent");
-    gradient.addColorStop(inner / (inner + outer), this.getColor("shadow"));
+    gradient.addColorStop(inner / (inner + outer), this.shadow);
     gradient.addColorStop(1, "transparent");
 
     canvas.ctx.arc(
@@ -117,9 +127,11 @@ class Ball extends Entity {
     canvas.ctx.fillStyle = color;
     canvas.ctx.fill();
 
-    canvas.ctx.strokeStyle = strokeColor;
-    canvas.ctx.lineWidth = thickness;
-    canvas.ctx.stroke();
+    if (this.thickness > 0) {
+      canvas.ctx.lineWidth = this.thickness;
+      canvas.ctx.strokeStyle = strokeColor;
+      canvas.ctx.stroke();
+    }
 
     canvas.ctx.closePath();
   }
@@ -202,7 +214,7 @@ class Ball extends Entity {
       const text = `${info.name ? `${info.name}: ` : ""}${value}`;
 
       canvas.ctx.font = `${fontSize}px Georgia`;
-      canvas.ctx.fillStyle = this.textColor;
+      canvas.ctx.fillStyle = this.text;
       canvas.ctx.textBaseline = "middle";
       canvas.ctx.textAlign = "center";
       canvas.ctx.fillText(
@@ -212,19 +224,6 @@ class Ball extends Entity {
           this.pos.y + ((props.length - 1) * lineHeight) / 2 - i * lineHeight
         )
       );
-    });
-  }
-
-  drawVectors() {
-    this.vel
-      .unit()
-      .multiply(3 * this.radius)
-      .draw(this.pos, "white");
-    Object.keys(this.accs).forEach((key) => {
-      this.accs[key]
-        .unit()
-        .multiply(2 * this.radius)
-        .draw(this.pos, "white");
     });
   }
 }

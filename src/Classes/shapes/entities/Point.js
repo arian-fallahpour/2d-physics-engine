@@ -1,12 +1,15 @@
-import * as model from "../../model";
+import * as model from "../../../model";
+import Shape from "../Shape";
 import Entity from "./Entity";
 
-class Point extends Entity {
-  constructor({ radius = 5, mass = 0, ...otherArgs }) {
+class Point extends Shape(Entity) {
+  constructor({ radius = 1, mass = 0, ...otherArgs }) {
     otherArgs.mass = mass;
     super(otherArgs);
 
     this.radius = radius;
+
+    this.initial = { ...this };
   }
 
   draw() {
@@ -25,10 +28,10 @@ class Point extends Entity {
       0,
       2 * Math.PI
     );
-    canvas.ctx.fillStyle = this.color;
+    canvas.ctx.fillStyle = this._colors.fill;
     canvas.ctx.fill();
 
-    canvas.ctx.strokeStyle = this.strokeColor;
+    canvas.ctx.strokeStyle = this._colors.stroke;
     canvas.ctx.lineWidth = this.thickness;
     canvas.ctx.stroke();
 

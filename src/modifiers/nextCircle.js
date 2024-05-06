@@ -1,15 +1,16 @@
 import Vector from "../classes/Vector";
-import Circle from "../classes/objects/Circle";
-import * as model from "../model";
+import Circle from "../classes/shapes/entities/Circle";
+import { state } from "../model";
 
-const bouncingCircles = () => {
+const bouncingCircles = (getVel = () => {}) => {
   return (data) => {
-    const circles = model.state.preset.objects.circles;
+    const circles = state.preset.objects.circles;
     const prevCircle = circles[circles.length - 1];
     const circle = circles[0];
 
     if (circle.radius <= prevCircle.radius) {
       circle.reset();
+      circle.vel = getVel();
 
       // Create new circle that is "stuck" to previous one
       const newCircle = new Circle({
@@ -19,10 +20,10 @@ const bouncingCircles = () => {
         radius: prevCircle.radius + (circle.thickness - 1) / 2,
         pos: prevCircle.pos,
         vel: new Vector(0, 0),
-        appliedAcc: new Vector(0, 0),
+        accs: {},
       });
 
-      model.state.preset.addObjects("circles", newCircle);
+      state.preset.addObjects("circles", newCircle);
     }
   };
 };

@@ -1,6 +1,6 @@
-const changeProp = (entity, change = (entity) => {}) => {
+const changeProp = (entity, change = (entity, data) => {}) => {
   return (data) => {
-    change(entity);
+    change(entity, data);
   };
 };
 

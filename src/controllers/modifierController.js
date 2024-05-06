@@ -5,8 +5,8 @@ import notes from "../data/notes";
 import Vector from "../classes/Vector";
 import Sound from "../classes/Sound";
 import Melody from "../classes/Melody";
-import Circle from "../classes/objects/Circle";
-import Ball from "../classes/objects/Ball";
+import Circle from "../classes/shapes/entities/Circle";
+import Ball from "../classes/shapes/entities/Ball";
 
 const blend = (current, final, step) => {
   if (current < final) {
@@ -40,7 +40,7 @@ export const revertBallModifier = (ball, reverter) => {
   const revert = () => {
     state.preset.canvas.setMode("lucid");
 
-    ball.color = ball.initial.color;
+    ball.fill = ball.initial.fill;
     ball.rainbow = false;
     ball.radius = blend(ball.radius, ball.initial.radius, 3);
     ball.pos = new Vector(

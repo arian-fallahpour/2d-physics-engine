@@ -1,8 +1,8 @@
 import Modifier from "../classes/Modifier";
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Ball from "../classes/objects/Ball";
-import Wall from "../classes/objects/Wall";
+import Ball from "../classes/shapes/entities/Ball";
+import Wall from "../classes/shapes/Wall";
 
 import generateRythm from "../modifiers/generateRythm";
 import generateRythm2 from "../modifiers/generateRythm2";
@@ -24,19 +24,22 @@ import keroseneMIDI from "../songs/midis/kerosene.json";
 import arabianNightsMIDI from "../songs/midis/arabianNights.json";
 import tetrisMIDI from "../songs/midis/tetris.json";
 import blindingLightsMIDI from "../songs/midis/blindingLights.json";
+import neverGonnaGiveYouUpMIDI from "../songs/midis/neverGonnaGiveYouUp.json";
+import ConstantAcc from "../classes/interactions/ConstantAcc";
 
 const initializer = (preset) => {
   // NOTE: IF BUGS OUT, PENETRATION RESOLUTION TRICK MAY BE REASON WHY
-  const generated = keroseneGen;
-  const isGenerating = true;
+  // TODO: Combine tracks
+  const generated = tadcGen;
+  const isGenerating = false;
   const options = {
-    midi: keroseneMIDI,
-    track: 4,
+    midi: tadcMIDI,
+    track: 0,
     notesStart: 0,
-    notesCount: 100,
+    notesCount: 200,
     wallThickness: 7,
     firstTime: 1,
-    maxBounceVel: 7,
+    maxBounceVel: 4,
   };
 
   // If generating platforms, add modifiers
@@ -45,7 +48,7 @@ const initializer = (preset) => {
       radius: 15,
       pos: preset.canvas.center,
       vel: new Vector(4, 0),
-      accs: { gravity: new Vector(0, -0.5) },
+      accs: { gravity: new ConstantAcc(0, -0.3) },
       color: "white",
       strokeColor: "transparent",
     });
@@ -64,10 +67,10 @@ const initializer = (preset) => {
 
     const ball = new Ball({
       ...ballInitial,
-      color: "rainbow",
+      fill: "rainbow",
       tailLength: 30,
       accs: {
-        gravity: new Vector(
+        gravity: new ConstantAcc(
           ballInitial.accs.gravity.x,
           ballInitial.accs.gravity.y
         ),
@@ -84,7 +87,7 @@ const initializer = (preset) => {
         end: new Vector(wallData.end, wallData.y),
         elasticity: wallData.elasticity,
         thickness: wallData.thickness,
-        color: "rgba(75, 75, 75, 1)",
+        fill: "rgba(75, 75, 75, 1)",
         edges: "round",
       });
       const transitions = [

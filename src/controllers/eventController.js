@@ -1,9 +1,44 @@
+import Vector from "../classes/Vector";
 import * as model from "../model";
-import * as Tone from "tone";
-import midi from "../songs/midis/tetris.json";
 
 const eventHandler = () => {
-  // EVENT HANDLERS
+  const canvas = model.state.preset.canvas;
+
+  // // SCALE EVENTS
+  // window.addEventListener("keydown", (e) => {
+  //   if (e.key === "-") {
+  //     canvas.setScale(canvas.scale * 0.95);
+  //   }
+
+  //   if (e.key === "=") {
+  //     canvas.setScale(canvas.scale * 1.05);
+  //   }
+  // });
+
+  // TRANSLATION EVENTS
+  // let dragging = false;
+  // const events = ["mousedown", "mouseleave", "mouseup", "mousemove"];
+  // events.forEach((event) =>
+  //   canvas.element.addEventListener(event, (e) => {
+  //     if (e.type === "mousedown") {
+  //       dragging = true;
+  //     }
+
+  //     if (e.type === "mouseup" || e.type === "mouseleave") {
+  //       dragging = false;
+  //     }
+
+  //     if (e.type === "mousemove") {
+  //       if (!dragging) return;
+  //       if (!model.state.play) return;
+
+  //       const translation = new Vector(e.movementX, e.movementY);
+  //       canvas.translate(translation);
+  //     }
+  //   })
+  // );
+
+  // BUTTON EVENTS
   const buttons = document.querySelector(".buttons");
   buttons.addEventListener("click", (e) => {
     // Play / pause button

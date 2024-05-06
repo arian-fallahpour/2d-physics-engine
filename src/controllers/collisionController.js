@@ -1,17 +1,25 @@
+import { state } from "../model";
+
 const fps = 60;
 
 // PENETRATION DETECTION
 export const isBallBallPenetrating = (ball1, ball2) => {
   const radiusSum = ball1.radius + ball2.radius;
   const distance = ball2.pos.subtract(ball1.pos);
-  return radiusSum >= distance.magnitude();
+  return (
+    ball1.radius + ball2.radius + ball1.thickness / 2 + ball2.thickness / 2 >=
+    distance.magnitude()
+  );
 };
 
 export const isBallWallPenetrating = (ball, wall) => {
   const closestPoint = wall.closestPointTo(ball.pos);
   const distance = closestPoint.subtract(ball.pos);
 
-  return ball.radius + (wall.thickness - 1) / 2 >= distance.magnitude();
+  return (
+    ball.radius + ball.thickness / 2 + wall.thickness / 2 >=
+    distance.magnitude()
+  );
 };
 
 export const isBallCirclePenetrating = (ball, circle) => {
@@ -24,7 +32,10 @@ export const isBallCirclePenetrating = (ball, circle) => {
   }
 
   // Case 2: Anywhere other than center of circle
-  return ball.radius + circle.thickness / 2 >= distance.magnitude();
+  return (
+    ball.radius + ball.thickness / 2 + circle.thickness / 2 >=
+    distance.magnitude()
+  );
 };
 
 export const isCircleCirclePenetrating = (circle1, circle2) => {
@@ -42,8 +53,8 @@ export const isCircleCirclePenetrating = (circle1, circle2) => {
   // Case 2: Anywhere other than center of circle
   return (
     smallerCircle.radius +
-      (smallerCircle.thickness - 1) / 2 +
-      (largerCircle.thickness - 1) / 2 >=
+      smallerCircle.thickness / 2 +
+      largerCircle.thickness / 2 >=
     distance.magnitude()
   );
 };
@@ -53,18 +64,25 @@ export const isCircleWallPenetrating = (circle, wall) => {
   const distance = closestPoint.subtract(circle.pos);
 
   return (
-    circle.radius + (circle.thickness - 1) / 2 + (wall.thickness - 1) / 2 >=
+    circle.radius + circle.thickness / 2 + wall.thickness / 2 >=
     distance.magnitude()
   );
 };
 
 // PENETRATION RESOLUTION
 export const resolveBallBallPenetration = (ball1, ball2) => {
-  const radiusSum = ball1.radius + ball2.radius;
   const distance = ball1.pos.subtract(ball2.pos);
 
   // Depth of penetration
-  let penetrationDepth = radiusSum - distance.magnitude();
+  let penetrationDepth =
+    ball1.radius +
+    ball2.radius +
+    ball1.thickness / 2 +
+    ball2.thickness / 2 -
+    distance.magnitude();
+
+  if (state.preset.options.reduceVelError)
+    penetrationDepth += ball1.thickness / 2 + ball2.thickness / 2;
 
   // Fixes balls getting stuck if on positions on x or y axis are the same
   if (ball1.pos.x === ball2.pos.x || ball1.pos.y === ball2.pos.y) {
@@ -87,10 +105,14 @@ export const resolveBallWallPenetration = (ball, wall) => {
   const normal = distance.unit();
 
   let penetrationDepth =
-    ball.radius + (wall.thickness - 1) / 2 - distance.magnitude();
+    ball.radius +
+    ball.thickness / 2 +
+    wall.thickness / 2 -
+    distance.magnitude();
 
   // Account for collisions that occur between frames
-  penetrationDepth += (fps / 1000) * ball.vel.magnitude();
+  if (state.preset.options.reduceVelError)
+    penetrationDepth += (fps / 1000) * ball.vel.magnitude();
 
   const resolution = normal.multiply(penetrationDepth);
 
@@ -108,11 +130,15 @@ export const resolveBallCirclePenetration = (ball, circle) => {
     distance.magnitude();
 
   // Account for collisions that occur between frames
-  penetrationDepth += (fps / 1000) * ball.vel.magnitude();
+  if (state.preset.options.reduceVelError)
+    penetrationDepth += (fps / 1000) * ball.vel.magnitude();
+
+  const systemInverseMass = ball.inverseMass + circle.inverseMass;
+  if (systemInverseMass === 0) return;
 
   const resolution = distance
     .unit()
-    .multiply(penetrationDepth / (ball.inverseMass + circle.inverseMass));
+    .multiply(penetrationDepth / systemInverseMass);
 
   ball.pos = ball.pos.subtract(resolution.multiply(ball.inverseMass));
   circle.pos = circle.pos.add(resolution.multiply(circle.inverseMass));
@@ -127,12 +153,13 @@ export const resolveCircleCirclePenetration = (circle1, circle2) => {
 
   let penetrationDepth =
     smallerCircle.radius +
-    (smallerCircle.thickness - 1) / 2 +
-    (largerCircle.thickness - 1) / 2 -
+    smallerCircle.thickness / 2 +
+    largerCircle.thickness / 2 -
     distance.magnitude();
 
   // Account for collisions that occur between frames
-  penetrationDepth += (fps / 1000) * smallerCircle.vel.magnitude();
+  if (state.preset.options.reduceVelError)
+    penetrationDepth += (fps / 1000) * smallerCircle.vel.magnitude();
 
   const resolution = distance
     .unit()
@@ -155,12 +182,13 @@ export const resolveCircleWallPenetration = (circle, wall) => {
 
   let penetrationDepth =
     circle.radius +
-    (circle.thickness - 1) / 2 +
-    (wall.thickness - 1) / 2 -
+    circle.thickness / 2 +
+    wall.thickness / 2 -
     distance.magnitude();
 
   // Account for collisions that occur between frames
-  // penetrationDepth += (fps / 1000) * circle.vel.magnitude();
+  if (state.preset.options.reduceVelError)
+    penetrationDepth += (fps / 1000) * circle.vel.magnitude();
 
   const resolution = normal.multiply(penetrationDepth);
 
@@ -218,6 +246,7 @@ export const resolveBallCircleCollision = (ball, circle) => {
   const newSeparatingVelocity = -separatingVelocity * circle.elasticity;
   const separatingVelocityDifference =
     newSeparatingVelocity - separatingVelocity;
+
   const impulse =
     separatingVelocityDifference / (ball.inverseMass + circle.inverseMass);
   const impulseVector = normal.multiply(impulse);
@@ -269,20 +298,8 @@ export const resolveCircleWallCollision = (circle, wall) => {
   const centerToStartIsCloser =
     centerToStart.magnitude() > centerToEnd.magnitude();
 
-  let separatingVelocity, normal;
-  // if (isWallCenterInsideCircle && centerToStartIsCloser) {
-  //   normal = centerToStart.unit();
-  //   separatingVelocity = circle.vel.dot(normal);
-  // } else if (isWallCenterInsideCircle && !centerToStartIsCloser) {
-  //   normal = centerToEnd.unit();
-  //   separatingVelocity = circle.vel.dot(normal);
-  // } else if (isWallCenterInsideCircle) {
-  //   normal = centerToCenter.unit();
-  //   separatingVelocity = circle.vel.dot(normal);
-  // } else {
-  normal = distance.unit();
-  separatingVelocity = circle.vel.dot(normal);
-  // }
+  const normal = distance.unit();
+  const separatingVelocity = circle.vel.dot(normal);
 
   const newSeparatingVelocity = -separatingVelocity * wall.elasticity;
   const separatingVelocityDifference =

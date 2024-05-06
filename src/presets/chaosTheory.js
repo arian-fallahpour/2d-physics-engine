@@ -1,57 +1,65 @@
+import ConstantAcc from "../classes/interactions/ConstantAcc";
 import Preset from "../classes/Preset";
 
-import Ball from "../classes/objects/Ball";
-import Circle from "../classes/objects/Circle";
+import Ball from "../classes/shapes/entities/Ball";
+import Circle from "../classes/shapes/entities/Circle";
 import Vector from "../classes/Vector";
 
 const initializer = (preset) => {
-  // preset.canvas.setMode("trail");
-
-  const circleRadius = 200;
-  const ballsCount = 3000;
-  const direction = new Vector(1, 1);
-  const velMagnitude = 5;
-  const totalAngle = Math.PI / 6;
+  const ballsCount = 1000;
+  const velocity = new Vector(3, 0).rotate(Math.PI / 2);
+  const totalAngle = Math.PI / 2;
 
   // 1. Create circle
   const circle = new Circle({
-    pos: new Vector(
-      preset.canvas.element.clientWidth / 2,
-      preset.canvas.element.clientHeight / 2
-    ),
-    radius: circleRadius,
+    pos: preset.canvas.center,
+    radius: 200,
     strokeColor: "white",
-    thickness: 2,
+    thickness: 10,
     mass: 0,
   });
-  preset.addObjects("circles", circle);
 
   // 2. Create Balls
   const balls = [];
   for (let i = 0; i < ballsCount; i++) {
+    const color = `hsl(${
+      (((i - 1) / ballsCount) * 180 + 250) % 360
+    }, 70%, 50%)`;
+
     const ball = new Ball({
-      pos: new Vector(
-        preset.canvas.element.clientWidth / 2,
-        preset.canvas.element.clientHeight / 2
+      pos: preset.canvas.center.add(
+        new Vector((i / ballsCount) * circle.radius - circle.thickness / 2, 0)
       ),
-      accs: { gravity: new Vector(0, -0.05) },
-      color: `hsl(${((i / ballsCount) * 180 + 250) % 360}, 70%, 50%)`,
+      vel: velocity,
+      // accs: { gravity: new ConstantAcc(0, -0.05) },
+      fill: color,
+      // path: color,
       radius: 1,
       strokeColor: "transparent",
+      // displayPath: true,
+      // pathLength: 2,
     });
-    ball.vel = direction
-      .unit()
-      .rotate(-totalAngle / 2)
-      .rotate((i / ballsCount) * totalAngle)
-      .multiply(velMagnitude);
     balls.push(ball);
   }
+
+  preset.addObjects("circles", circle);
   preset.addObjects("balls", ...balls);
 };
 
 const chaosTheory = new Preset({
-  name: "chaose theory",
+  name: "chaos theory",
   initializer,
+  options: {
+    stepsPerFrame: 6,
+    reduceVelError: true,
+    ODESolverMethod: "euler",
+    collisions: {
+      ballToBall: false,
+    },
+  },
+  canvas: {
+    // mode: "trail",
+  },
 });
 
 export default chaosTheory;

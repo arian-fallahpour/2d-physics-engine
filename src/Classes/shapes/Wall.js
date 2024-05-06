@@ -1,30 +1,41 @@
 import { state } from "../../model";
 
-import Entity from "./Entity";
 import Vector from "../Vector";
+import Shape from "./Shape";
+import Entity from "./entities/Entity";
 
-class Wall extends Entity {
+class Wall extends Shape() {
   constructor({
     start = new Vector(0, 0),
     end = new Vector(0, 0),
     elasticity = 1,
     edges = "butt",
-    strokeColor = "white",
+    stroke = "white",
+    thickness = 1,
     ...otherArgs
   }) {
-    otherArgs.strokeColor = strokeColor;
+    otherArgs.stroke = stroke;
     super(otherArgs);
 
     this.start = start;
     this.end = end;
     this.elasticity = elasticity;
     this.edges = edges;
+    this.thickness = thickness;
 
-    this.setInitial();
+    this.initial = { ...this };
   }
 
   get center() {
     return this.start.add(this.end.subtract(this.start).divide(2));
+  }
+
+  update() {
+    if (this.shadow !== "transparent") {
+      this.drawShadow();
+    }
+
+    this.draw();
   }
 
   draw() {
@@ -36,7 +47,7 @@ class Wall extends Entity {
     canvas.ctx.lineCap = this.edges;
     canvas.ctx.moveTo(this.start.x, canvas.toCanvasY(this.start.y));
     canvas.ctx.lineTo(this.end.x, canvas.toCanvasY(this.end.y));
-    canvas.ctx.strokeStyle = this.getColor("fill");
+    canvas.ctx.strokeStyle = this._colors.stroke;
     canvas.ctx.stroke();
     canvas.ctx.closePath();
   }
@@ -45,14 +56,13 @@ class Wall extends Entity {
     const { canvas } = state.preset;
 
     canvas.ctx.beginPath();
-    canvas.ctx.lineWidth = 0.5;
 
     // Center shadow
     const shadowReach = this.end
       .subtract(this.start)
       .normal()
       .unit()
-      .multiply(this.shadowLength);
+      .multiply(this.shadowBlur);
     const start1 = this.start.add(shadowReach);
     const start2 = this.start.add(shadowReach.multiply(-1));
     const end1 = this.end.add(shadowReach);
@@ -65,7 +75,7 @@ class Wall extends Entity {
       canvas.toCanvasY(start2.y)
     );
     gradient1.addColorStop(0, "transparent");
-    gradient1.addColorStop(0.5, this.shadowColor);
+    gradient1.addColorStop(0.5, this._colors.shadow);
     gradient1.addColorStop(1, "transparent");
 
     canvas.ctx.moveTo(start1.x, canvas.toCanvasY(start1.y));
@@ -89,20 +99,20 @@ class Wall extends Entity {
       0,
       this.start.x,
       canvas.toCanvasY(this.start.y),
-      this.shadowLength
+      this.shadowBlur
     );
-    gradient2.addColorStop(0, this.shadowColor);
+    gradient2.addColorStop(0, this._colors.shadow);
     gradient2.addColorStop(1, "transparent");
 
     canvas.ctx.arc(
       this.start.x,
       canvas.toCanvasY(this.start.y),
-      this.shadowLength,
+      this.shadowBlur,
       angle - Math.PI / 2,
       angle - Math.PI / 2 - Math.PI,
       true
     );
-    const final2 = this.start.add(new Vector(0, this.shadowLength));
+    const final2 = this.start.add(new Vector(0, this.shadowBlur));
     canvas.ctx.lineTo(final2.x, canvas.toCanvasY(final2.y));
 
     canvas.ctx.fillStyle = gradient2;
@@ -119,19 +129,19 @@ class Wall extends Entity {
       0,
       this.end.x,
       canvas.toCanvasY(this.end.y),
-      this.shadowLength
+      this.shadowBlur
     );
-    gradient3.addColorStop(0, this.shadowColor);
+    gradient3.addColorStop(0, this._colors.shadow);
     gradient3.addColorStop(1, "transparent");
 
     canvas.ctx.arc(
       this.end.x,
       canvas.toCanvasY(this.end.y),
-      this.shadowLength,
+      this.shadowBlur,
       angle - Math.PI / 2,
       angle - Math.PI / 2 + Math.PI
     );
-    const final3 = this.end.add(new Vector(0, this.shadowLength));
+    const final3 = this.end.add(new Vector(0, this.shadowBlur));
     canvas.ctx.lineTo(final3.x, canvas.toCanvasY(final3.y));
 
     // canvas.ctx.fillStyle = "red";

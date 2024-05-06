@@ -1,39 +1,52 @@
 import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
-import Point from "../classes/objects/Point";
-import Spring from "../classes/objects/Spring";
+import Ball from "../classes/shapes/entities/Ball";
+import Point from "../classes/shapes/entities/Point";
+import HardConstraint from "../classes/interactions/HardConstraint";
+import Spring from "../classes/interactions/Spring(deprecated)";
+import SoftConstraint from "../classes/interactions/SoftConstraint";
+import AccGenerator from "../classes/AccGenerator";
 
 const initializer = (preset) => {
-  const totalLength = 300;
-  const joints = 10;
-  const length = totalLength / joints;
+  const pendulums = 1;
+  const joints = 3;
+  const length = 100;
+  const angleDiff = 0.000005;
 
-  // 1. Create fixed point
   const fixed = new Point({
     pos: preset.canvas.center,
+    radius: 0.5,
   });
   preset.addObjects("points", fixed);
 
   const points = preset.objects.points;
-  for (let i = 1; i <= joints; i++) {
-    const point = new Point({
-      mass: 1,
-      pos: points[points.length - 1].pos.add(new Vector(length, 0)),
-      accs: { gravity: new Vector(0, -0.2) },
-      radius: 0.5,
-      controls: true,
-      movingMagnitude: 50,
-    });
-    preset.addObjects("points", point);
+  for (let i = 0; i < pendulums; i++) {
+    const stroke = `hsl(${((i / pendulums) * 180 + 250) % 360}, 70%, 50%)`;
 
-    const joint = new Spring({
-      start: points[points.length - 2],
-      end: points[points.length - 1],
-      length,
-      stiffness: 20000,
-      damping: 0.05,
-    });
-    preset.addObjects("springs", joint);
+    for (let j = 0; j < joints; j++) {
+      const point = new Ball({
+        pos: preset.canvas.center.add(
+          new Vector(length * (j + 1), 0).rotate(i * -angleDiff)
+        ),
+        accs: {
+          gravity: new AccGenerator(() => new Vector(0, -0.5)),
+        },
+        radius: 0.5,
+        fill: "transparent",
+        path: "rainbow",
+        displayPath: j === joints - 1,
+      });
+
+      const pendulum = new HardConstraint({
+        entity1: j === 0 ? fixed : points[points.length - 1],
+        entity2: point,
+        length,
+        stroke: i === pendulums - 1 ? "white" : stroke,
+      });
+
+      preset.addObjects("points", point);
+      preset.addInteractions(pendulum);
+    }
   }
 };
 
@@ -41,7 +54,11 @@ const pendulums = new Preset({
   name: "pendulums",
   initializer,
   options: {
-    stepsPerFrame: 100,
+    ODESolverMethod: "rk4",
+    stepsPerFrame: 4,
+  },
+  canvas: {
+    // mode: "lucid",
   },
 });
 
