@@ -7,7 +7,7 @@ This project is a 2D physics engine designed to simulate the motion and interact
 Check out the hundreds of videos that I have uploaded, including tutorials, fun minigames and more!
 My channel has currently amassed over +3 million views!
 
-[Link] (https://www.youtube.com/@user-fl5xn8dw4k)
+[Link](https://www.youtube.com/@user-fl5xn8dw4k)
 
 ## Features
 - Rigid Body Dynamics: Simulates realistic object movement with mass, velocity, and acceleration.
