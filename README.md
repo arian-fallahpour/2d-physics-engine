@@ -49,6 +49,8 @@ const bouncingCircles = new Preset({
 
 ```
 
+Once you are done, import the preset in the `index.js` and include it in the list of presets in the argument of `model.loadPresets()`.
+
 ## Physics Objects
 
 The physics engine is quite robuste, and it ecompasses a variety of objects that you can play around with.
