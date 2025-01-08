@@ -19,35 +19,33 @@ const initializer = (preset) => {
   });
   preset.addObjects("points", fixed);
 
-  const points = preset.objects.points;
-  for (let i = 0; i < pendulums; i++) {
-    const stroke = `hsl(${((i / pendulums) * 180 + 250) % 360}, 70%, 50%)`;
+  // const points = preset.objects.points;
+  // for (let i = 0; i < pendulums; i++) {
+  //   const stroke = `hsl(${((i / pendulums) * 180 + 250) % 360}, 70%, 50%)`;
 
-    for (let j = 0; j < joints; j++) {
-      const point = new Ball({
-        pos: preset.canvas.center.add(
-          new Vector(length * (j + 1), 0).rotate(i * -angleDiff)
-        ),
-        accs: {
-          gravity: new AccGenerator(() => new Vector(0, -0.5)),
-        },
-        radius: 0.5,
-        fill: "transparent",
-        path: "rainbow",
-        displayPath: j === joints - 1,
-      });
+  //   for (let j = 0; j < joints; j++) {
+  //     const point = new Ball({
+  //       pos: preset.canvas.center.add(new Vector(length * (j + 1), 0).rotate(i * -angleDiff)),
+  //       accs: {
+  //         gravity: new AccGenerator(() => new Vector(0, -0.5)),
+  //       },
+  //       radius: 0.5,
+  //       fill: "transparent",
+  //       path: "rainbow",
+  //       displayPath: j === joints - 1,
+  //     });
 
-      const pendulum = new HardConstraint({
-        entity1: j === 0 ? fixed : points[points.length - 1],
-        entity2: point,
-        length,
-        stroke: i === pendulums - 1 ? "white" : stroke,
-      });
+  //     const pendulum = new SoftConstraint({
+  //       entity1: j === 0 ? fixed : points[points.length - 1],
+  //       entity2: point,
+  //       length,
+  //       stroke: i === pendulums - 1 ? "white" : stroke,
+  //     });
 
-      preset.addObjects("points", point);
-      preset.addInteractions(pendulum);
-    }
-  }
+  //     preset.addObjects("points", point);
+  //     preset.addInteractions(pendulum);
+  //   }
+  // }
 };
 
 const pendulums = new Preset({

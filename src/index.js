@@ -21,18 +21,18 @@ import trappedBall from "./presets/trappedBall";
 const main = () => {
   // Load presets
   model.loadPresets(
-    chaosTheory,
-    nBodyChaosTheory,
-    singleBall,
     pendulums,
-    circlesInCircles,
-    digitsOfPI,
-    plinko,
-    trappedBall,
-    borderedBall,
-    fractals,
     platformRythms,
+    nBodyChaosTheory,
+    chaosTheory,
+    plinko,
+    borderedBall,
+    trappedBall,
+    digitsOfPI,
+    singleBall,
     bouncingCircles,
+    circlesInCircles,
+    fractals,
     testing
   );
 

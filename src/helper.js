@@ -1,3 +1,4 @@
+import Vector from "./classes/Vector";
 import * as engine from "./data/engine";
 
 export function serialize(classInstance) {
@@ -35,4 +36,27 @@ export function transition(step, duration, initial, final) {
     return initial;
   }
   return initial + (step / duration) * (final - initial);
+}
+
+export function withPixelData(src, width, height, pixelSize, cb) {
+  const image = new Image(width, height);
+  image.src = src;
+  image.onload = function () {
+    const canvas = document.getElementById("canvas-2");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const pixels = [];
+    for (let i = 0; i < width; i += 2 * pixelSize) {
+      for (let j = 0; j < height; j += 2 * pixelSize) {
+        const imageData = ctx.getImageData(i, j, 1, 1).data;
+        const color = `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
+        pixels.push({ pos: new Vector(i, -j + height).add(new Vector(-width / 2, -height / 2)), color });
+      }
+    }
+
+    cb(pixels);
+  };
 }

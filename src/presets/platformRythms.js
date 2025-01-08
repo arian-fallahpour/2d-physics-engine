@@ -54,10 +54,7 @@ const initializer = (preset) => {
     });
     preset.addObjects("balls", ball);
     preset.canvas.focusOn(ball);
-    const frameModifier = new Modifier({ type: "frame" }).use(
-      generateRythm2,
-      options
-    );
+    const frameModifier = new Modifier({ type: "frame" }).use(generateRythm2, options);
     preset.addModifier(frameModifier);
   }
 
@@ -70,10 +67,7 @@ const initializer = (preset) => {
       fill: "rainbow",
       tailLength: 30,
       accs: {
-        gravity: new ConstantAcc(
-          ballInitial.accs.gravity.x,
-          ballInitial.accs.gravity.y
-        ),
+        gravity: new ConstantAcc(ballInitial.accs.gravity.x, ballInitial.accs.gravity.y),
       },
       vel: new Vector(ballInitial.vel.x, ballInitial.vel.y),
       pos: new Vector(ballInitial.pos.x, ballInitial.pos.y),
@@ -107,9 +101,7 @@ const initializer = (preset) => {
           duration: 0.2,
         },
       ];
-      wall.addModifier(
-        new Modifier().use(transitionEntityTemplate, wall, ...transitions)
-      );
+      wall.addModifier(new Modifier().use(transitionEntityTemplate, wall, ...transitions));
       wall.addModifier(new Modifier().use(playToneTemplate, wallData.note));
       wall.addModifier(new Modifier().use(removeEntity, preset, "walls", i, 4));
       preset.addObjects("walls", wall);

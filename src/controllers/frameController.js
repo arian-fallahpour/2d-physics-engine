@@ -84,7 +84,7 @@ const frameHandler = (timeMs) => {
     }
 
     // Circle to wall penetrations
-    if (preset.options.collisions.circleToCircle) {
+    if (preset.options.collisions.circleToWall) {
       for (let j = 0; j < walls.length; j++) {
         const wall = walls[j];
 
@@ -196,8 +196,7 @@ export const requestNextFrame = (firstFrame = false) => {
 const calculateFrameMetrics = (timeMs) => {
   if (engine.frame % state.preset.options.stepsPerFrame === 0) {
     engine.frameTime = timeMs - engine.timeMs;
-    engine.framesPerSecond =
-      engine.frameTime === 0 ? null : 1000 / engine.frameTime;
+    engine.framesPerSecond = engine.frameTime === 0 ? null : 1000 / engine.frameTime;
     engine.timeMs = timeMs;
 
     window.framesPerSecond = engine.framesPerSecond;

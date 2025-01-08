@@ -7,6 +7,8 @@ import Wall from "../classes/shapes/Wall";
 import ConstantAcc from "../classes/interactions/ConstantAcc";
 import Modifier from "../classes/Modifier";
 import Text from "../classes/shapes/entities/Text";
+import Sound from "../classes/Sound";
+import notes from "../data/notes";
 
 const initializer = (preset) => {
   const options = {
@@ -68,23 +70,12 @@ const initializer = (preset) => {
   const walls = [];
   for (let i = 0; i <= options.layers; i++) {
     const circlesCount = options.layers + options.circlesInitial;
-    const startX =
-      (-circlesCount / 2 + i) * options.layerHeight +
-      options.layerHeight +
-      options.radiusCircle;
-    const startY =
-      options.gridHeight -
-      options.layers * options.layerHeight -
-      options.maxThickness / 2;
+    const startX = (-circlesCount / 2 + i) * options.layerHeight + options.layerHeight + options.radiusCircle;
+    const startY = options.gridHeight - options.layers * options.layerHeight - options.maxThickness / 2;
 
     const wall = new Wall({
       start: preset.canvas.center.add(new Vector(startX, startY)),
-      end: preset.canvas.center.add(
-        new Vector(
-          startX + options.layerHeight - options.radiusCircle * 2,
-          startY
-        )
-      ),
+      end: preset.canvas.center.add(new Vector(startX + options.layerHeight - options.radiusCircle * 2, startY)),
       color: "rgba(255, 255, 255, .5)",
       thickness: options.maxThickness,
     });
@@ -178,8 +169,7 @@ function detectBall(preset, options, textCount) {
       const wall = preset.objects.walls[i];
 
       wall.thickness = options.maxThickness * v + 10;
-      const startY =
-        wall.initial.start.y + options.maxThickness / 2 - wall.thickness / 2;
+      const startY = wall.initial.start.y + options.maxThickness / 2 - wall.thickness / 2;
 
       wall.start = new Vector(wall.start.x, startY);
       wall.end = new Vector(wall.end.x, startY);

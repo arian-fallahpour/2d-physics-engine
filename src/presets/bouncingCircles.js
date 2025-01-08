@@ -30,8 +30,8 @@ const initializer = (preset) => {
     pos: preset.canvas.center,
     mass: 1,
     radius: 230,
-    stroke: "rgba(0, 0, 255, .3)",
-    accs: { gravity: new ConstantAcc(0, -0.2) },
+    stroke: "rgba(0, 0, 255, 1)",
+    accs: { gravity: new ConstantAcc(0, -0.1) },
     thickness: circleThickness,
     vel: getVel(),
   });

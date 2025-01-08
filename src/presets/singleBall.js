@@ -11,7 +11,7 @@ import playTone from "../modifiers/playTone";
 
 import AccGenerator from "../classes/AccGenerator";
 
-import MIDI from "../songs/midis/pedro.json";
+import MIDI from "../songs/midis/TADC.json";
 import Text from "../classes/shapes/entities/Text";
 import ConstantAcc from "../classes/interactions/ConstantAcc";
 import Wall from "../classes/shapes/Wall";
@@ -23,52 +23,57 @@ const initializer = (preset) => {
     pos: preset.canvas.center,
     radius: 200,
     thickness: 10,
-    elasticity: 1.005,
+    stroke: "#2e2e2e",
   });
 
-  const ball1 = new Ball({
-    pos: preset.canvas.center.add(new Vector(-100, 0)),
+  const ball = new Ball({
+    pos: preset.canvas.center,
     radius: 15,
     accs: { gravity: new ConstantAcc(0, -0.4) },
+    vel: new Vector(10, 0).rotate(Math.PI * Math.random()),
     fill: "rainbow",
-  });
-  const playToneModifier1 = new Modifier();
-  playToneModifier1.use(playTone, MIDI.tracks[0]);
-  ball1.addModifier(playToneModifier1);
-
-  const ball2 = new Ball({
-    pos: preset.canvas.center.add(new Vector(100, 0)),
-    radius: 15,
-    accs: { gravity: new ConstantAcc(0, -0.4) },
-    fill: "rainbow",
-  });
-  const playToneModifier2 = new Modifier();
-  playToneModifier2.use(playTone, MIDI.tracks[0]);
-  ball2.addModifier(playToneModifier2);
-
-  const spring = new SoftConstraint({
-    entity1: ball1,
-    entity2: ball2,
-    length: 100,
-    zigzagCount: 29,
+    tailLength: 10,
   });
 
-  const collideModifier = new Modifier({ type: "active" });
-  collideModifier.use((ball) => {
-    return (data) => {
-      if (!ball1 && !ball2) return;
+  const changePropModifier = new Modifier();
+  changePropModifier.use(changeProp, (entity, data) => {});
+  ball.addModifier(changePropModifier);
 
-      ball1.radius += 0.75;
-      ball2.radius += 0.75;
-      spring.length += 0.75;
-      spring.zigzagCount += 0.75;
+  const playToneModifier = new Modifier();
+  playToneModifier.use(playTone, MIDI.tracks[0]);
+  ball.addModifier(playToneModifier);
+
+  const movePlatformModifier = new Modifier({
+    type: "frame",
+    occurance: "after",
+  });
+  movePlatformModifier.use(() => {
+    const length = 100;
+
+    return () => {
+      const direction = ball.pos.subtract(circle.pos).unit();
+      const tangent = direction.normal();
+
+      const center = circle.pos.add(direction.multiply(circle.radius));
+      const point1 = center.add(tangent.multiply(length / 2));
+      const point2 = center.subtract(tangent.multiply(length / 2));
+
+      const { canvas } = preset;
+
+      canvas.ctx.beginPath();
+      canvas.ctx.lineWidth = circle.thickness;
+      canvas.ctx.lineCap = "round";
+      canvas.ctx.moveTo(point1.x, canvas.toCanvasY(point1.y));
+      canvas.ctx.lineTo(point2.x, canvas.toCanvasY(point2.y));
+      canvas.ctx.strokeStyle = "white";
+      canvas.ctx.stroke();
+      canvas.ctx.closePath();
     };
   });
-  ball2.addModifier(collideModifier);
+  preset.addModifier(movePlatformModifier);
 
   preset.addObjects("circles", circle);
-  preset.addObjects("balls", ball1, ball2);
-  preset.addInteractions(spring);
+  preset.addObjects("balls", ball);
 };
 
 const singleBall = new Preset({

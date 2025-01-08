@@ -2,91 +2,65 @@ import Preset from "../classes/Preset";
 import Vector from "../classes/Vector";
 import Ball from "../classes/shapes/entities/Ball";
 import Attraction from "../classes/interactions/Attraction";
-import Point from "../classes/shapes/entities/Point";
+import { withPixelData } from "../helper";
 
 const initializer = (preset) => {
   const ballsCount = 100;
-  const distance = 300;
   const gravityStrength = 5;
   const distanceMax = 100000;
   const distanceMin = 5000;
-  const angleDiff = 0.0000005;
-  const velocity = new Vector(7, 0).rotate(Math.PI / 4 + 0.08);
-  const translation = new Vector(0, 0);
+  const angleDiff = 0;
+  const velocity = new Vector(3, 0).rotate(0);
+  const ballRadius = 1;
+  const translation = new Vector(-200, 200);
 
-  // 1. Create black holes
-  const hole1 = new Ball({
-    radius: 15,
-    pos: preset.canvas.center.add(new Vector(-distance / 2, 0)),
-    shadowBlur: 50,
-    shadow: "rgba(255,255,255,.3)",
-    fill: "black",
-    stroke: "white",
-    mass: 0,
+  withPixelData("/src/images/obama.jpeg", 150, 150, ballRadius / 1.5, (pixels) => {
+    // 1. Create black holes
+    const hole1 = new Ball({
+      radius: 15,
+      pos: preset.canvas.center,
+      // pos: preset.canvas.center.add(new Vector(-distance / 2, 0)),
+      shadowBlur: 50,
+      shadow: "rgba(255,255,255,.3)",
+      fill: "black",
+      stroke: "white",
+      mass: 0,
+    });
+
+    const circleRadius = 10;
+
+    const balls = [];
+    for (let i = 0; i < pixels.length; i++) {
+      // const color = `hsl(${((i / ballsCount) * 180 + 250) % 360}, 70%, 50%)`;
+      const color = pixels[i].color;
+
+      const ball = new Ball({
+        radius: 1,
+        fill: color,
+        path: color,
+        pos: preset.canvas.center.add(translation).add(pixels[i].pos),
+        mass: 0.000001,
+        vel: velocity.rotate(i * angleDiff - (angleDiff * ballsCount) / 2),
+        path: color,
+      });
+
+      const attraction1 = new Attraction({
+        entity1: hole1,
+        entity2: ball,
+        strength: gravityStrength,
+        inverseStrength: 0.05,
+        maxRadius: distanceMax,
+        minRadius: distanceMin,
+        inverseRadius: 50,
+      });
+
+      balls.push(ball);
+      preset.addInteractions(attraction1);
+    }
+
+    preset.addObjects("balls", ...balls);
+    preset.addObjects("balls", hole1);
   });
-
-  const hole2 = new Ball({
-    radius: 15,
-    pos: preset.canvas.center.add(new Vector(distance / 2, 0)),
-    shadowBlur: 50,
-    shadow: "rgba(255,255,255,.3)",
-    fill: "black",
-    stroke: "white",
-    mass: 0,
-  });
-
-  const balls = [];
-  for (let i = 0; i < ballsCount; i++) {
-    const color = `hsl(${((i / ballsCount) * 180 + 250) % 360}, 70%, 50%)`;
-
-    const ball = new Ball({
-      radius: 1,
-      fill: color,
-      path: color,
-      pos: preset.canvas.center.add(translation),
-      mass: 0.00001,
-      vel: velocity.rotate(i * angleDiff - (angleDiff * ballsCount) / 2),
-      path: color,
-      displayPath: true,
-      pathLength: 50,
-    });
-
-    const attraction1 = new Attraction({
-      entity1: hole1,
-      entity2: ball,
-      strength: gravityStrength,
-      inverseStrength: 0.05,
-      maxRadius: distanceMax,
-      minRadius: distanceMin,
-      inverseRadius: 50,
-    });
-    const attraction2 = new Attraction({
-      entity1: hole2,
-      entity2: ball,
-      strength: gravityStrength,
-      inverseStrength: 0.05,
-      maxRadius: distanceMax,
-      minRadius: distanceMin,
-      inverseRadius: 50,
-    });
-
-    balls.push(ball);
-    preset.addInteractions(attraction1, attraction2);
-  }
-
-  // for (let i = 1; i < balls.length; i++) {
-  //   console.log(balls, i - 1, i);
-  //   const attraction = new Attraction({
-  //     entity1: balls[i - 1],
-  //     entity1: balls[i],
-  //     strength: 0.01,
-  //     minRadius: 10000,
-  //   });
-  //   preset.addInteractions(attraction);
-  // }
-
-  preset.addObjects("balls", ...balls);
-  preset.addObjects("balls", hole1, hole2);
 };
 
 const nBodyChaosTheory = new Preset({
@@ -99,6 +73,7 @@ const nBodyChaosTheory = new Preset({
       ballToBall: false,
     },
   },
+  // canvas: { mode: "lucid" },
 });
 
 export default nBodyChaosTheory;
